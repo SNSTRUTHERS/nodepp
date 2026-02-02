@@ -34,8 +34,8 @@ namespace nodepp { class mutex_t {
 protected:
 
     struct NODE {
-        bool /*-*/ alive=1;
-        HANDLE /*----*/ fd;
+        atomic_t<bool> alive=1;
+        HANDLE /*-*/ fd;
     };  ptr_t<NODE> obj;
 
 public:
