@@ -147,7 +147,7 @@ public:
 
     void close() const noexcept {
         if( is_state ( STATE::FS_STATE_DISABLE ) ){ return; }
-            set_state( STATE::FS_STATE_CLOSE   ); DONE:;
+            set_state( STATE::FS_STATE_CLOSE   );
     onDrain.emit(); free(); }
 
     /*─······································································─*/
