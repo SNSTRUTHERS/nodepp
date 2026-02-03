@@ -89,7 +89,7 @@ protected:
             ::dup2( fda[0], STDIN_FILENO  ); ::close( fda[1] ); arg.push( nullptr );
             ::dup2( fdb[1], STDOUT_FILENO ); ::close( fdb[0] ); env.push( nullptr );
             ::dup2( fdc[1], STDERR_FILENO ); ::close( fdc[0] ); /*----------------*/
-            ::execvpe( arg[0], (char**) arg.data(), (char**) env.data() );
+            ::execvpe( arg[0], const_cast<char**>(arg.data()), const_cast<char**>(env.data()) );
             throw except_t("while spawning new cluster");
         } elif ( obj->fd > 0 ) {
             obj->input  = file_t(fda[1]); ::close( fda[0] );
