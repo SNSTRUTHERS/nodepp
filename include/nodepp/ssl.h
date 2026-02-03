@@ -118,7 +118,7 @@ protected:
 
     template< class T >
     bool is_blocked( T* stream, int& c ) const noexcept {
-    return stream->is_closed() ? -1 : obj->is_blocked( obj, stream, c )==-1 ? 0 : 1; }
+    return !stream->is_closed() && obj->is_blocked( obj, stream, c )!=-1; }
 
     /*─······································································─*/
 

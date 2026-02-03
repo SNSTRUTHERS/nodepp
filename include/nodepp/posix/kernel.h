@@ -77,9 +77,9 @@ protected:
 
         EPOLLFD event  ; memset( &event, 0, sizeof( EPOLLFD ) );
         event.events   = id->data.flag & FLAG::KV_STATE_READ
-                       ? EPOLLIN : EPOLLOUT ;
+                       ? (uint32)EPOLLIN : (uint32)EPOLLOUT ;
         event.events  |= id->data.flag & FLAG::KV_STATE_EDGE
-                       ? EPOLLET : 0x00 ;
+                       ? (uint32)EPOLLET : 0x00 ;
         event.data.fd  = id->data.fd;
         event.data.ptr = id;
 

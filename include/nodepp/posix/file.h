@@ -92,7 +92,7 @@ protected:
 
     /*─······································································─*/
 
-    uint get_fd_flag( const string_t& flag ){ uint _flag = O_NONBLOCK;
+    int get_fd_flag( const string_t& flag ){ int _flag = O_NONBLOCK;
         if  ( flag == "r"  ){ _flag |= O_RDONLY ;                     }
         elif( flag == "w"  ){ _flag |= O_WRONLY | O_CREAT  | O_TRUNC; }
         elif( flag == "a"  ){ _flag |= O_WRONLY | O_APPEND | O_CREAT; }
@@ -175,19 +175,19 @@ public:
     /*─······································································─*/
 
     ulong pos( ulong _pos ) const noexcept {
-        auto   _npos = lseek( obj->fd, _pos, SEEK_SET );
-        return _npos < 0 ? 0 : _npos;
+        auto   _npos = lseek( obj->fd, off_t(_pos), SEEK_SET );
+        return _npos < 0 ? 0 : (ulong)_npos;
     }
 
     ulong size() const noexcept { auto curr = pos();
         if( lseek( obj->fd, 0 , SEEK_END )<0 ){ return 0; }
-        ulong size = lseek( obj->fd, 0, SEEK_END );
-        pos( curr ); return size;
+        auto size = lseek( obj->fd, 0, SEEK_END );
+        pos( curr ); return (ulong)size;
     }
 
     ulong pos() const noexcept {
         auto   _npos = lseek( obj->fd, 0, SEEK_CUR );
-        return _npos < 0 ? 0 : _npos;
+        return _npos < 0 ? 0 : (ulong)_npos;
     }
 
     /*─······································································─*/
@@ -261,7 +261,7 @@ public:
 
     virtual int __read( char* bf, const ulong& sx ) const noexcept {
         if( is_closed() ){ return -1; } if( sx==0 ){ return 0; }
-        obj->feof = ::read( obj->fd, bf, sx );
+        obj->feof = (int)::read( obj->fd, bf, sx );
         obj->feof = is_blocked(obj->feof)? -2 : obj->feof;
         if( obj->feof <= 0 && obj->feof != -2 ){ return -1; }
         return obj->feof;
@@ -269,7 +269,7 @@ public:
 
     virtual int __write( char* bf, const ulong& sx ) const noexcept {
         if( is_closed() ){ return -1; } if( sx==0 ){ return 0; }
-        obj->feof = ::write( obj->fd, bf, sx );
+        obj->feof = (int)::write( obj->fd, bf, sx );
         obj->feof = is_blocked(obj->feof)? -2 : obj->feof;
         if( obj->feof <= 0 && obj->feof != -2 ){ return -1; }
         return obj->feof;
@@ -281,7 +281,7 @@ public:
         if( sx==0 || is_closed() ){ return 1; } while( *sy<sx ) {
             int c = __write( bf + *sy, sx - *sy );
             if( c <= 0 && c != -2 ) /*----*/ { return 0; }
-            if( c >  0 ){ *sy+= c; continue; } return 1;
+            if( c >  0 ){ *sy+= (ulong)c; continue; } return 1;
         }   return 0;
     }
 
@@ -289,7 +289,7 @@ public:
         if( sx==0 || is_closed() ){ return 1; } while( *sy<sx ) {
             int c = __read( bf + *sy, sx - *sy );
             if( c <= 0 && c != -2 ) /*----*/ { return 0; }
-            if( c >  0 ){ *sy+= c; continue; } return 1;
+            if( c >  0 ){ *sy+= (ulong)c; continue; } return 1;
         }   return 0;
     }
 

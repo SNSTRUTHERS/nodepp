@@ -158,9 +158,9 @@ namespace nodepp::encoder::hex {
     requires(type::is_integral<T>::value)
     { if ( num.empty() ){ return 0; }
         T out = 0; for ( auto c: num ){    out  = T(out<<4);
-              if ( c >= '0' && c <= '9' ){ out |= c - '0'     ; }
-            elif ( c >= 'a' && c <= 'f' ){ out |= c - 'a' + 10; }
-            elif ( c >= 'A' && c <= 'F' ){ out |= c - 'A' + 10; }
+              if ( c >= '0' && c <= '9' ){ out |= T(c - '0'     ); }
+            elif ( c >= 'a' && c <= 'f' ){ out |= T(c - 'a' + 10); }
+            elif ( c >= 'A' && c <= 'F' ){ out |= T(c - 'A' + 10); }
             else { return 0; }
         }   return out;
     }

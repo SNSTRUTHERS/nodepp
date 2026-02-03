@@ -88,7 +88,7 @@ namespace nodepp::generator::file {
         if( state<=0 ){ coEnd; }
         if( state >0 ){ data=string_t(str->get_buffer_data(),(ulong)state); }}
 
-        state = min( data.size(), size ); /*---------------*/
+        state = (int)min( data.size(), size ); /*---------------*/
         str->set_borrow( data.splice( state, data.size() ) );
 
     coFinish }};
@@ -105,7 +105,7 @@ namespace nodepp::generator::file {
 
         do{ coWait((state=str->_write( msg.data()+data, msg.size()-data ))==-2 );
         if( state<=0 ){ coEnd; }
-        if( state >0 ){ data += state; }} while ( state>=0 && data<msg.size() );
+        if( state >0 ){ data += (ulong)state; }} while ( state>=0 && data<msg.size() );
 
     coFinish }};
 
@@ -133,7 +133,7 @@ namespace nodepp::generator::file {
                  data=str->get_borrow().splice( 0, state-pos );
         } else { data=str->get_borrow().splice( 0, state     ); }
 
-        state = data.size();
+        state = int(data.size());
 
     coFinish }
 
@@ -148,8 +148,8 @@ namespace nodepp::generator::file {
             if ( ch ==x ){ break; } continue; }
         } while(0);
 
-        data +=str->get_borrow().splice( 0, state );
-        state =data.size();
+        data += str->get_borrow().splice( 0, state );
+        state = int(data.size());
 
         if( data[ data.size()-1 ] == ch ){ coEnd; }
 
@@ -172,8 +172,8 @@ namespace nodepp::generator::file {
              if('\n'==x ){ break; } continue; }
         } while(0);
 
-        data +=str->get_borrow().splice( 0, state );
-        state =data.size();
+        data += str->get_borrow().splice( 0, state );
+        state = int(data.size());
 
         if( data[data.size()-1] == '\n' ){ coEnd; }
 
@@ -204,7 +204,7 @@ namespace nodepp::generator::ssl {
         coEmit( T& obj, V* stream, int& c ){
         coBegin;
 
-            do { d  =BIO_read( obj->wbio, &bff, bff.size() );
+            do { d  =BIO_read( obj->wbio, &bff, (int)bff.size() );
                  err=SSL_get_error( obj->ssl, c ); ERR_clear_error();
             if ( d > 0 ){ coWait( (x=stream->socket_t::__write( &bff, d ))==-2 ); }} while(0);
 

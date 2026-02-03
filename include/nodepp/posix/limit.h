@@ -33,7 +33,7 @@ namespace nodepp::limit {
     }
 
     inline int set_max_cpus_threads( int size ){
-        return size<=os::cpus() ? 1 : -1;
+        return (uint)size<=os::cpus() ? 1 : -1;
     }
 
 }

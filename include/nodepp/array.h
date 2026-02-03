@@ -452,7 +452,7 @@ namespace nodepp::string {
     array_t<string_t> split_view( string_t _str, const T& pattern ){
         queue_t<string_t> out; ulong offset=0; ptr_t<int> idx;
 
-        while( (idx=_str.find( pattern, offset )) != nullptr ){
+        while( (idx=_str.find( char(pattern), offset )) != nullptr ){
             out.push( _str.slice_view( (long)offset, idx[0] ) ); offset=(ulong)idx[1];
         }   out.push( _str.slice_view( (long)offset ) );
 
@@ -463,7 +463,7 @@ namespace nodepp::string {
     array_t<string_t> split( string_t _str, const T& pattern ){
         queue_t<string_t> out; ulong offset=0; ptr_t<int> idx;
 
-        while( (idx=_str.find( pattern, offset )) != nullptr ){
+        while( (idx=_str.find( char(pattern), offset )) != nullptr ){
             out.push( _str.slice( (long)offset, idx[0] ) ); offset=(ulong)idx[1];
         }   out.push( _str.slice( (long)offset ) );
 
