@@ -234,6 +234,12 @@ template< class T > T clamp( const T& val, const T& _min, const T& _max ){ retur
 #endif
 #endif
 
+#if defined __GNUC__ && !defined __clang__
+#   define DISCARD(...) __extension__ static_cast<void>(({ [[maybe_unused]] auto _ = (__VA_ARGS__); }))
+#else
+#   define DISCARD(...) static_cast<void>(__VA_ARGS__)
+#endif
+
 /*────────────────────────────────────────────────────────────────────────────*/
 
 #define typeof(DATA) string_t( typeid(DATA).name() )

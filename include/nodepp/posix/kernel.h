@@ -261,7 +261,7 @@ public:
         while( obj->idx --> 0 ){ do {
         if( obj->ev[ (ulong)obj->idx ].data.ptr==nullptr ){
             uint64_t value=0;
-            ::read( obj->ed,&value, sizeof(value));
+            DISCARD(::read( obj->ed,&value, sizeof(value)));
         break; }
 
             auto x = obj->ev[ (ulong)obj->idx ];
