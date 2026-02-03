@@ -16,7 +16,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace type {
+namespace nodepp::type {
 
     template <bool B, typename T, typename F> struct conditional      { using type = T; };
     template <typename T, typename F> struct conditional<false, T, F> { using type = F; };
@@ -343,11 +343,11 @@ namespace nodepp { namespace type {
 
     template<typename T, typename U> struct pair { T first;  U second; };
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace type {
+namespace nodepp::type {
 
     template<typename T> typename remove_reference<T>::type&& move(T&& arg){ 
       return static_cast<typename remove_reference<T>::type&&>( arg ); 
@@ -387,7 +387,7 @@ namespace nodepp { namespace type {
         }
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

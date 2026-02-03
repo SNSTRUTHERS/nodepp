@@ -26,21 +26,21 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
-  
-    inline uint get_max_cpus_threads(){ 
-        return os::cpus(); 
+namespace nodepp::limit {
+
+    inline uint get_max_cpus_threads(){
+        return os::cpus();
     }
 
     inline int set_max_cpus_threads( int size ){
         return size<=os::cpus() ? 1 : -1;
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit { 
+namespace nodepp::limit {
 
     inline uint get_hard_fileno() { struct rlimit limit;
         if( getrlimit( RLIMIT_NOFILE, &limit )==0 ) 
@@ -116,8 +116,8 @@ namespace nodepp { namespace limit {
         case   PRIORITY::HIGHEST_PRIORITY:  n = -15; break;
         case   PRIORITY::REALTIME_PRIORITY: n = -20; break; default: return -1;
     }   return nice(n)!=-1 ? priority : -1; }
-    
-}}
+
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

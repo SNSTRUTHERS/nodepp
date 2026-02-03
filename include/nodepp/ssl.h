@@ -23,7 +23,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { class ssl_t { 
+namespace nodepp { class ssl_t {
 protected:
     
     using onSNI = function_t<ssl_t*,string_t>;

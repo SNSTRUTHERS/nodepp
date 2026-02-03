@@ -18,9 +18,8 @@
 #include "evloop.h"
 #include "env.h"
 
-/*────────────────────────────────────────────────────────────────────────────*/
-
-namespace nodepp { namespace process { array_t<string_t> args;
+namespace nodepp::process {
+    inline array_t<string_t> args;
 
     template< class... T >
     void error( const T&... msg ){ throw except_t( msg... ); }
@@ -47,7 +46,7 @@ namespace nodepp { namespace process { array_t<string_t> args;
 
     inline void wait(){ process::stop(); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

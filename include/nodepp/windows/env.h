@@ -20,7 +20,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process { namespace env {
+namespace nodepp::process::env {
 
     inline int    set( const string_t& name, const string_t& value ){ return SetEnvironmentVariableA( name.c_str(), value.c_str() ); }
     
@@ -41,17 +41,17 @@ namespace nodepp { namespace process { namespace env {
             auto match = reg.get_memory  ();
             /*--------*/ reg.clear_memory();
 
-            if ( match.size() != 2 ){ continue; } 
+            if ( match.size() != 2 ){ continue; }
             set( match[0], match[1] );
         }
-        
+
     } catch(...) { return -1; } return 1; }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process {
+namespace nodepp::process {
 
     inline bool  is_child(){ return !env::get("CHILD").empty(); }
 
@@ -61,7 +61,7 @@ namespace nodepp { namespace process {
 
     inline string_t shell(){ return  env::get("COMSPEC");     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

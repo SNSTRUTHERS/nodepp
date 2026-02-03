@@ -25,7 +25,7 @@
     #include "initializer.h"
     #include "windows/popen.h"
 
-    namespace nodepp { namespace popen {
+    namespace nodepp::popen {
 
         template< class... T > string_t await( const T&... args ){
             string_t out; auto pid = type::bind( popen_t( args... ) );
@@ -38,15 +38,15 @@
             worker::add([=](){ return pid->next(); }); 
         return *pid; }
 
-    }}
+    }
 
 #elif _KERNEL_ == NODEPP_KERNEL_POSIX
 
     #include "fs.h"
     #include "initializer.h"
     #include "posix/popen.h"
-    
-    namespace nodepp { namespace popen {
+
+    namespace nodepp::popen {
 
         template< class... T > string_t await( const T&... args ){
             string_t out; auto pid = type::bind( popen_t( args... ) );
@@ -59,7 +59,7 @@
             process::add([=](){ return pid->next(); }); 
         return *pid; }
 
-    }}
+    }
 
 #else
     #error "This OS Does not support popen.h"

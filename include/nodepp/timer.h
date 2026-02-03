@@ -22,8 +22,8 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace timer {
-    
+namespace nodepp::timer {
+
     template< class V, class... T >
     ptr_t<task_t> add ( V func, ulong* time, const T&... args ){
         auto prs = generator::timer::timer();
@@ -112,19 +112,19 @@ namespace nodepp { namespace utimer {
     ptr_t<task_t> interval( V func, ulong time, const T&... args ){
         return utimer::add([=]( T... args ){ func(args...); return 1; }, time, args... );
     }
-    
+
     /*─······································································─*/
-    
+
     inline void await( ulong* time ){ process::await( coroutine::add( COROUTINE(){
     coBegin ; coUDelay( *time ) ; coFinish }) ); }
 
     inline void await( ulong time ){ await( type::cast<ulong>( &time ) ); }
-    
+
     /*─······································································─*/
 
     inline void clear( ptr_t<task_t> address ){ process::clear( address ); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

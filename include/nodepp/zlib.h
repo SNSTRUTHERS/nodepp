@@ -136,7 +136,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace zlib { namespace inflate {
+namespace nodepp::zlib::inflate {
 
     inline string_t get( const string_t& data ){ return zlib_t(15).update_inflate(data,Z_FINISH); }
 
@@ -159,11 +159,11 @@ namespace nodepp { namespace zlib { namespace inflate {
     
     inline zlib_t get(){ return zlib_t(15); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace zlib { namespace deflate {
+namespace nodepp::zlib::deflate {
 
     inline string_t get( const string_t& data ){ return zlib_t(15).update_deflate(data,Z_FINISH); }
 
@@ -186,11 +186,11 @@ namespace nodepp { namespace zlib { namespace deflate {
     
     inline zlib_t get(){ return zlib_t(15); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace zlib { namespace raw_inflate {
+namespace nodepp::zlib::raw_inflate {
 
     inline string_t get( const string_t& data ){ return zlib_t(-15).update_inflate(data,Z_FINISH); }
 
@@ -240,11 +240,11 @@ namespace nodepp { namespace zlib { namespace raw_deflate {
     
     inline zlib_t get(){ return zlib_t(-15); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace zlib { namespace gunzip {
+namespace nodepp::zlib::gunzip {
 
     inline string_t get( const string_t& data ){ return zlib_t(15|32).update_inflate(data,Z_FINISH); }
 
@@ -266,12 +266,12 @@ namespace nodepp { namespace zlib { namespace gunzip {
     return out; }
     
     inline zlib_t get(){ return zlib_t(15|32); }
-    
-}}}
+
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace zlib { namespace gzip {
+namespace nodepp::zlib::gzip {
 
     inline string_t get( const string_t& data ){ return zlib_t(15|16).update_deflate(data,Z_FINISH); }
 
@@ -294,7 +294,7 @@ namespace nodepp { namespace zlib { namespace gzip {
     
     inline zlib_t get(){ return zlib_t(15|16); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

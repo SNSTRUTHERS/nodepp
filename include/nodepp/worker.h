@@ -30,7 +30,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace worker { 
+namespace nodepp::worker {
 
     template< class V, class... T >
     void await( V cb, const T&... args ){ 
@@ -43,7 +43,7 @@ namespace nodepp { namespace worker {
         wrk.add(); return wrk; 
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

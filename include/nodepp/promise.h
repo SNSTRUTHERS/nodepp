@@ -213,7 +213,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace promise { 
+namespace nodepp::promise {
 
     template< class T, class... V >
     promise_t<null_t,except_t> resolve( T cb, const V&... args ) {
@@ -232,11 +232,11 @@ namespace nodepp { namespace promise {
 
     }); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace promise {
+namespace nodepp::promise {
 
     template< class V >
     promise_t<V,except_t> all( const V& prom ) {
@@ -285,7 +285,7 @@ namespace nodepp { namespace promise {
 
     }); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

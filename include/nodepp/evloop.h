@@ -38,8 +38,6 @@ namespace nodepp::process { inline atomic_t<bool> _EXIT_ = false;
 
     inline kernel_t& NODEPP_EV_LOOP(){ thread_local static kernel_t evloop; return evloop; }
 
-    kernel_t& NODEPP_EV_LOOP(){ thread_local static kernel_t evloop; return evloop; }
-    
     /*─······································································─*/
 
     template< class... T >

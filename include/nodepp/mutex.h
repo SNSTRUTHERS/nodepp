@@ -29,14 +29,14 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace mutex {
+namespace nodepp::mutex {
 
     template< class T, class... V >
     function_t<int,V...> add( mutex_t mut, T cb, const V&... args ){
         return [=](){ return mut.emit( cb, args... ); };
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

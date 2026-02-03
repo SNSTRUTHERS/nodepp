@@ -414,7 +414,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace regex {
+namespace nodepp::regex {
 
     inline string_t remove( const string_t& _str, const string_t& _reg, bool _flg=false ){
         regex_t reg( _reg, _flg ); return reg.remove( _str );
@@ -531,7 +531,7 @@ namespace nodepp { namespace regex {
         return array_t<string_t>( out.data() ).join("");
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

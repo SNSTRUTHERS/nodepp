@@ -22,7 +22,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace key {
+namespace nodepp::encoder::key {
 
     inline string_t generate( const string_t& alph, int x=32 ){ ulong idx=0;
         string_t data ( (ulong)x, '\0' ); for( auto &x: data ){
@@ -31,11 +31,11 @@ namespace nodepp { namespace encoder { namespace key {
 
     inline string_t generate( int x=32 ) { return generate( NODEPP_BASE64, x ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace hash {
+namespace nodepp::encoder::hash {
 
     inline ulong get( const string_t& key, int tableSize ) {
         ulong hash = 5381; forEach( x, key ) {
@@ -47,11 +47,11 @@ namespace nodepp { namespace encoder { namespace hash {
 
     inline ulong get( const string_t& key )    { return get( key, HASH_TABLE_SIZE ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace XOR {
+namespace nodepp::encoder::XOR {
 
     inline string_t get( string_t data, const string_t& key ){
         auto  tmp= data.copy();
@@ -77,11 +77,11 @@ namespace nodepp { namespace encoder { namespace XOR {
     template< class... T >
     string_t btoa( T... args ) { return set( args... ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace bytes {
+namespace nodepp::encoder::bytes {
 
     template< class T >
     ptr_t<uchar> get( T num ){
@@ -106,11 +106,11 @@ namespace nodepp { namespace encoder { namespace bytes {
     template< class T >
     T btoa( const ptr_t<uchar>& num ) { return set<T>( num ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace bin {
+namespace nodepp::encoder::bin {
 
     template< class T >
     ptr_t<bool> get( T num ){
@@ -136,11 +136,11 @@ namespace nodepp { namespace encoder { namespace bin {
     template< class T >
     T btoa( const ptr_t<bool>& num ) { return set<T>( num ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace hex {
+namespace nodepp::encoder::hex {
 
     template< class T, class = typename type::enable_if<type::is_integral<T>::value,T>::type >
     string_t get( T num ){ string_t out; do {
@@ -168,11 +168,11 @@ namespace nodepp { namespace encoder { namespace hex {
     template< class T, class = typename type::enable_if<type::is_integral<T>::value,T>::type >
     T btoa( string_t num ) { return set<T>( num ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace hex {
+namespace nodepp::encoder::hex {
 
     inline string_t get( const ptr_t<uchar>& inp ){
         if ( inp.empty() ){ return nullptr; }
@@ -195,11 +195,11 @@ namespace nodepp { namespace encoder { namespace hex {
 
     inline string_t atob( const ptr_t<uchar>& inp ) { return get( inp ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace buffer {
+namespace nodepp::encoder::buffer {
 
     inline string_t hex2buff( const string_t& inp ){
         if( inp.empty() ){ return nullptr; }
@@ -222,21 +222,21 @@ namespace nodepp { namespace encoder { namespace buffer {
 
     inline string_t btoa( const string_t& inp ) { return hex2buff( inp ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace base16 {
+namespace nodepp::encoder::base16 {
 
     inline string_t atob( const string_t& inp ) { return buffer::buff2hex( inp ); }
 
     inline string_t btoa( const string_t& inp ) { return buffer::hex2buff( inp ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace base64 {
+namespace nodepp::encoder::base64 {
 
     inline string_t get( const string_t &in ) {
 
@@ -279,28 +279,28 @@ namespace nodepp { namespace encoder { namespace base64 {
 
     inline string_t atob( const string_t &in ) { return get( in ); }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace utf8 {
+namespace nodepp::encoder::utf8 {
     inline ptr_t<uint16> to_utf16( ptr_t<uint8> inp ){ return utf::utf8_to_utf16( inp ); }
     inline ptr_t<uint32> to_utf32( ptr_t<uint8> inp ){ return utf::utf8_to_utf32( inp ); }
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace utf16 {
+namespace nodepp::encoder::utf16 {
     inline ptr_t<uint8>  to_utf8 ( ptr_t<uint16> inp ){ return utf::utf16_to_utf8 ( inp ); }
     inline ptr_t<uint32> to_utf32( ptr_t<uint16> inp ){ return utf::utf16_to_utf32( inp ); }
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace encoder { namespace utf32 {
+namespace nodepp::encoder::utf32 {
     inline ptr_t<uint8>  to_utf8 ( ptr_t<uint32> inp ){ return utf::utf32_to_utf8 ( inp ); }
     inline ptr_t<uint16> to_utf16( ptr_t<uint32> inp ){ return utf::utf32_to_utf16( inp ); }
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

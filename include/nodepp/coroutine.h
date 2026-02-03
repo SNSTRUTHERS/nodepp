@@ -82,14 +82,14 @@ namespace coroutine { enum STATE {
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace coroutine {
+namespace nodepp::coroutine {
     inline coroutine_t add( function_t<int,int&,ulong&> callback ) {
     return coroutine_t( callback ); }
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace coroutine {
+namespace nodepp::coroutine {
     inline co_state_t getno( int state=0, int _state_=0, ulong time=0 ){
     thread_local static co_state_t tmp; co_state_t out; 
     
@@ -106,7 +106,7 @@ namespace nodepp { namespace coroutine {
     }   
     
     DONE:; return out; }
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

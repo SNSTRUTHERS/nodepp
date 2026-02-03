@@ -21,8 +21,8 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace stream {
-    
+namespace nodepp::stream {
+
     template< class T, class V, class U >
     ptr_t<task_t> until( const T& fa, const V& fb, const U& val ){ generator::stream::until arg;
     return process::poll( fa, POLL_STATE::READ | POLL_STATE::EDGE, arg, 0UL, fa, fb, val ); }
@@ -77,7 +77,7 @@ namespace nodepp { namespace stream {
     template< class T > 
     void unpipe( const T& input ){ input.stop(); input.onUnpipe.emit(); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

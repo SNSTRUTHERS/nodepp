@@ -213,7 +213,7 @@ namespace nodepp {
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace date {
+namespace nodepp::date {
 
     inline uint now(){ return date_t().get_stamp(); }
 
@@ -231,7 +231,7 @@ namespace nodepp { namespace date {
 
     inline uint second( const bool& utc ){ return date_t(utc).get_second(); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

@@ -19,7 +19,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace console {
+namespace nodepp::console {
 
     template< class... T >
     int err( const T&... args ){ return conio::err(args...,"\n"); }
@@ -69,7 +69,7 @@ namespace nodepp { namespace console {
         return log( args... ); 
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

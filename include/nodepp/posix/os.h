@@ -27,8 +27,8 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace os {
-    
+namespace nodepp::os {
+
     inline string_t hostname(){ char buff[UNBFF_SIZE]; return ::gethostname(buff,UNBFF_SIZE)==0 ? buff : nullptr; }
     
     /*─······································································─*/
@@ -61,7 +61,7 @@ namespace nodepp { namespace os {
 
     inline uint error(){ return errno; }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

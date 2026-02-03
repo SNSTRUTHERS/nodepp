@@ -21,22 +21,22 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
-  
-    inline uint get_max_cpus_threads(){ 
-        return os::cpus(); 
+namespace nodepp::limit {
+
+    inline uint get_max_cpus_threads(){
+        return os::cpus();
     }
 
     inline int set_max_cpus_threads( int size ){
         return size<=os::cpus() ? 1 : -1;
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
-    
+namespace nodepp::limit {
+
     inline int set_hard_fileno( uint value ) { return _setmaxstdio( value ); }
 
     inline int set_soft_fileno( uint value ) { return _setmaxstdio( value ); }
@@ -46,12 +46,12 @@ namespace nodepp { namespace limit {
     inline uint get_hard_fileno() { return _getmaxstdio(); }
 
     inline uint get_soft_fileno() { return _getmaxstdio(); }
-    
-}}
+
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
+namespace nodepp::limit {
 
     inline uint get_hard_thread_pool() {
         MEMORYSTATUSEX status; status.dwLength = sizeof(status);
@@ -72,12 +72,12 @@ namespace nodepp { namespace limit {
         return ( value <= get_hard_thread_pool() ) ? 0 : -1;
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
-    
+namespace nodepp::limit {
+
     struct PRIORITY{ enum FLAG {
          IDLE_PRIORITY    , LOW_PRIORITY     ,
          NORMAL_PRIORITY  , HIGH_PRIORITY    ,
@@ -93,8 +93,8 @@ namespace nodepp { namespace limit {
              case   PRIORITY::REALTIME_PRIORITY: n=REALTIME_PRIORITY_CLASS;     break; default: return -1;
         }    return SetPriorityClass( GetCurrentProcess(), n ) ? priority : -1;
     }
-    
-}}
+
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

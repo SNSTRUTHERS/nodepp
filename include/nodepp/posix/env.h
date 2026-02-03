@@ -23,7 +23,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process { namespace env {
+namespace nodepp::process::env {
 
     inline int set( const string_t& name, const string_t& value ){ return setenv( name.c_str(), value.c_str(), 1 ); }
 
@@ -47,11 +47,11 @@ namespace nodepp { namespace process { namespace env {
         
     } catch(...) { return -1; } return 1; }
 
-}}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process {
+namespace nodepp::process {
 
     inline bool  is_child(){ return !env::get("CHILD").empty(); }
 

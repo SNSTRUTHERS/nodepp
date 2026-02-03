@@ -31,7 +31,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process {
+namespace nodepp::process {
 
     event_t<int> onSIGERROR; event_t<> onSIGEXIT; event_t<> onSIGCLOSE;
 
@@ -60,7 +60,7 @@ namespace nodepp { namespace process {
 
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

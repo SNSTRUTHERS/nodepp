@@ -50,7 +50,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace ws {
+namespace nodepp::ws {
 
     inline tcp_t server( const tcp_t& skt ){ skt.onSocket([=]( socket_t raw ){
 
@@ -87,16 +87,16 @@ namespace nodepp { namespace ws {
 
         ws_t cli = type::cast<ws_t>(raw);
 
-        process::add([=](){ 
+        process::add([=](){
             cli.set_timeout(0); cli.resume();
             skt.onConnect.resume( );
-            skt.onConnect.emit(cli);  
+            skt.onConnect.emit(cli);
             stream::pipe      (cli);
         return -1; });
 
     }); skt.connect( url::hostname(uri), url::port(uri) ); return skt; }
 
-}}
+}
 
 #undef NODEPP_WS_SECRET
 #endif

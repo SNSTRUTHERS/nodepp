@@ -97,7 +97,7 @@ namespace nodepp::iterator {
 #if !defined(NODEPP_ITERATOR_STRING) && defined(NODEPP_STRING)
     #define  NODEPP_ITERATOR_STRING
 
-namespace nodepp { namespace string {
+namespace nodepp::string {
 
     template< class U >
     void map( U func ){ }
@@ -173,6 +173,6 @@ namespace nodepp { namespace string {
         return array_t<string_t>( list.data() ).join( c );
     }
 
-}}
+}
 
 #endif

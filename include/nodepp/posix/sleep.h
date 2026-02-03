@@ -32,8 +32,8 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process { using NODE_INTERVAL = struct timeval; } }
-namespace nodepp { namespace process { 
+namespace nodepp::process { using NODE_INTERVAL = struct timeval; }
+namespace nodepp::process {
 
     inline NODE_INTERVAL& get_time_interval(){ 
         thread_local static NODE_INTERVAL interval; 
@@ -53,11 +53,11 @@ namespace nodepp { namespace process {
         return time.tv_sec * 1000 + time.tv_usec / 1000; 
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process {
+namespace nodepp::process {
 
     inline ulong& get_timeout( bool reset=false ) {
     thread_local static ulong stamp=0; 
@@ -72,11 +72,11 @@ namespace nodepp { namespace process {
         if( *stamp>(ulong)time ){ *stamp=(ulong)time; }
     return out==0 ? 1 : out; }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process {
+namespace nodepp::process {
 
     inline void delay( ulong time ){ ::usleep(time*1000); }
 
@@ -84,7 +84,7 @@ namespace nodepp { namespace process {
 
     inline ulong now(){ return millis(); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

@@ -29,7 +29,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace os {
+namespace nodepp::os {
 
     inline string_t get_arch() { switch( _OS_ ){
 
@@ -60,7 +60,7 @@ namespace nodepp { namespace os {
     }}
 
 
-} }
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

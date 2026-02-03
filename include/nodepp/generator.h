@@ -19,7 +19,7 @@
 
 #if !defined(GENERATOR_TIMER) && defined(NODEPP_TIMER) && defined(NODEPP_GENERATOR)
     #define  GENERATOR_TIMER
-namespace nodepp { namespace generator { namespace timer {
+namespace nodepp::generator::timer {
 
     GENERATOR( timer ){ public:
 
@@ -59,7 +59,7 @@ namespace nodepp { namespace generator { namespace timer {
 
     };
 
-}}}
+}
 #undef NODEPP_GENERATOR
 #endif
 
@@ -67,7 +67,7 @@ namespace nodepp { namespace generator { namespace timer {
 
 #if !defined(GENERATOR_FILE) && defined(NODEPP_FILE) && defined(NODEPP_GENERATOR)
     #define  GENERATOR_FILE
-namespace nodepp { namespace generator { namespace file {
+namespace nodepp::generator::file {
 
     GENERATOR( read ){
     protected: ulong d; ulong* r;
@@ -174,12 +174,12 @@ namespace nodepp { namespace generator { namespace file {
 
         data +=str->get_borrow().splice( 0, state );
         state =data.size();
-        
+
         if( data[data.size()-1] == '\n' ){ coEnd; }
 
     coGoto(1) ; coFinish }};
 
-}}}
+}
 #undef NODEPP_GENERATOR
 #endif
 
@@ -188,7 +188,7 @@ namespace nodepp { namespace generator { namespace file {
 #if !defined(GENERATOR_SSL) && defined(NODEPP_SSL) && defined(NODEPP_GENERATOR)
     #define  GENERATOR_SSL
 
-namespace nodepp { namespace generator { namespace ssl {
+namespace nodepp::generator::ssl {
 
     GENERATOR( pipe ){
     protected:
@@ -230,7 +230,7 @@ namespace nodepp { namespace generator { namespace ssl {
 
     };
 
-}}}
+}
 
 #undef NODEPP_GENERATOR
 #endif
@@ -239,7 +239,7 @@ namespace nodepp { namespace generator { namespace ssl {
 
 #if !defined(GENERATOR_STREAM) && defined(NODEPP_STREAM) && defined(NODEPP_GENERATOR)
     #define  GENERATOR_STREAM
-namespace nodepp { namespace generator { namespace stream {
+namespace nodepp::generator::stream {
 
     GENERATOR( duplex ){
     protected:
@@ -404,7 +404,7 @@ namespace nodepp { namespace generator { namespace stream {
 
     };
 
-}}}
+}
 #undef NODEPP_GENERATOR
 #endif
 
@@ -412,7 +412,7 @@ namespace nodepp { namespace generator { namespace stream {
 
 #if !defined(GENERATOR_ZLIB) && defined(NODEPP_ZLIB) && defined(NODEPP_GENERATOR)
     #define  GENERATOR_ZLIB
-namespace nodepp { namespace generator { namespace zlib {
+namespace nodepp::generator::zlib {
 
     GENERATOR( pipe_inflate ){
     protected:
@@ -498,7 +498,7 @@ namespace nodepp { namespace generator { namespace zlib {
 
     };
 
-}}}
+}
 #undef NODEPP_GENERATOR
 #endif
 
@@ -508,7 +508,7 @@ namespace nodepp { namespace generator { namespace zlib {
 #define GENERATOR_WS
     #include "encoder.h"
     #include "crypto.h"
-namespace nodepp { namespace generator { namespace ws {
+namespace nodepp::generator::ws {
 
     struct ws_frame_t {
         bool  FIN;     //1b
@@ -713,6 +713,6 @@ namespace nodepp { namespace generator { namespace ws {
 
     };
 
-}}}
+}
 #undef NODEPP_GENERATOR
 #endif

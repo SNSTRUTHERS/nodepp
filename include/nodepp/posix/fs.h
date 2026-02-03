@@ -23,7 +23,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace fs {
+namespace nodepp::fs {
 
     inline file_t readable( const string_t& path, const ulong& _size=CHUNK_SIZE ){ return file_t( path, "r", _size ); }
     inline file_t writable( const string_t& path, const ulong& _size=CHUNK_SIZE ){ return file_t( path, "w", _size ); }
@@ -221,7 +221,7 @@ namespace nodepp { namespace fs {
         return ::system( cmd.c_str() );
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

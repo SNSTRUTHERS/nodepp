@@ -232,14 +232,14 @@ public: json_t() noexcept {}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace json {
+namespace nodepp::json {
     inline object_t  parse( const string_t& str ){ json_t json; return json.parse ( str ); }
     inline string_t format( const object_t& obj ){ json_t json; return json.format( obj ); }
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace json {
+namespace nodepp::json {
 
     template<class T, class V>
     object_t parse( const map_t<T,V>& map ){
@@ -254,11 +254,11 @@ namespace nodepp { namespace json {
         }   return format( obj );
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace json {
+namespace nodepp::json {
 
     template<class T, class V>
     array_t<object_t> parse( const array_t<map_t<T,V>>& map ){
@@ -272,16 +272,16 @@ namespace nodepp { namespace json {
         return json::format( obj );
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace json {
+namespace nodepp::json {
     template< class... T >
     string_t stringify( const T&... args ){ 
       return format( args... ); 
     }
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

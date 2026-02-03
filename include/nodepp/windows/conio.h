@@ -21,17 +21,17 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace conio { enum color {
+namespace nodepp::conio { enum color {
     black = 0x00, white  = 0x01,
     green = 0x02, red    = 0x03,
     blue  = 0x04, cyan   = 0x05,
     yellow= 0x06, magenta= 0x07,
     bold  = 0x10  /*----------*/
-};}}
+};}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace conio { WORD attr = 0, dflt = 7;
+namespace nodepp::conio { WORD attr = 0, dflt = 7;
 
     /*─······································································─*/
 
@@ -129,7 +129,7 @@ namespace nodepp { namespace conio { WORD attr = 0, dflt = 7;
     inline int  done( string_t msg ){ foreground( color::green  | color::bold ); return log( msg ); }
     inline int  warn( string_t msg ){ foreground( color::yellow | color::bold ); return log( msg ); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

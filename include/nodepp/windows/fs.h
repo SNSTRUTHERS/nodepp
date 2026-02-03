@@ -22,7 +22,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace fs {
+namespace nodepp::fs {
 
     inline file_t std_input ( const ulong& _size=CHUNK_SIZE ){ return file_t( GetStdHandle( STD_INPUT_HANDLE ), _size ); }
     inline file_t std_output( const ulong& _size=CHUNK_SIZE ){ return file_t( GetStdHandle( STD_OUTPUT_HANDLE), _size ); }
@@ -249,7 +249,7 @@ namespace nodepp { namespace fs {
         return CopyFileA( opath.c_str(), npath.c_str(), 0 )!=0 ? -1 : 0;
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

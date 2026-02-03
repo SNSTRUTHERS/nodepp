@@ -16,12 +16,13 @@
 /*────────────────────────────────────────────────────────────────────────────*/
 
 #include "any.h"
+#include "array.h"
 #include "map.h"
 #include "initializer.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace type { 
+namespace nodepp::type {
 
     template< class T > struct obj_type_id                    { static constexpr int value = 0x0000 |  0; };
 
@@ -58,7 +59,7 @@ namespace nodepp { namespace type {
     template< class T > struct obj_type_id<array_t<T>>        { static constexpr int value = 0xfA00 | obj_type_id<T>::value; };
     template< class T > struct obj_type_id<map_t<string_t,T>> { static constexpr int value = 0xfC00 | obj_type_id<T>::value; };
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

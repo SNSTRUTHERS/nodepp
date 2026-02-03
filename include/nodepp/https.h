@@ -133,7 +133,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace https {
+namespace nodepp::https {
 
     inline tls_t server( function_t<void,https_t> cb, ssl_t* ssl=nullptr, agent_t* opt=nullptr ){
         return tls_t([=]( https_t cli ){
@@ -175,7 +175,7 @@ namespace nodepp { namespace https {
 
     }); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

@@ -34,7 +34,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace _socket_ {
+namespace nodepp::_socket_ {
 
     inline void start_device(){ 
     thread_local static bool sockets=false;
@@ -42,7 +42,7 @@ namespace nodepp { namespace _socket_ {
         sockets = true;
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

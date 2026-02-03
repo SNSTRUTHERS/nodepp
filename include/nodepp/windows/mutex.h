@@ -21,17 +21,17 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace worker {
+namespace nodepp::worker {
 
     inline void delay( ulong time ){ process::delay(time); }
-    
+
     inline void yield(){ delay(TIMEOUT); SwitchToThread(); }
 
     inline DWORD  pid(){ return GetCurrentThreadId(); }
 
     inline void  exit(){ ExitThread(0); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

@@ -413,7 +413,7 @@ protected:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace type {
+namespace nodepp::type {
 
     template< class T, class V > 
     T* cast( V* object ){ 
@@ -430,11 +430,11 @@ namespace nodepp { namespace type {
     template< class T, class V > 
     T cast( V object ){ return (T)( object ); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace type {
+namespace nodepp::type {
 
     template< class T >
     ptr_t<T> bind( T* object ){
@@ -460,7 +460,7 @@ namespace nodepp { namespace type {
         } else { return ptr_t<T>( new T( object ) ); }
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

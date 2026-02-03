@@ -14,6 +14,10 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 #if _KERNEL_ == NODEPP_KERNEL_WINDOWS
     
     #include "fs.h"
@@ -21,7 +25,7 @@
     #include "initializer.h"
     #include "windows/cluster.h"
 
-    namespace nodepp { namespace cluster {
+    namespace nodepp::cluster {
 
         template< class... T > cluster_t async( const T&... args ){
         auto pid = type::bind( cluster_t(args...) ); 
@@ -64,15 +68,15 @@
 
         template< class... T > int await( const T&... args ){
         auto pid = type::bind( cluster_t(args...) );
-        if( process::is_parent() ) { 
-          return process::await([=](){ return pid->next(); }); 
+        if( process::is_parent() ) {
+          return process::await([=](){ return pid->next(); });
         } return -1; }
 
         inline bool  is_child(){ return !process::env::get("CHILD").empty(); }
 
         inline bool is_parent(){ return  process::env::get("CHILD").empty(); }
 
-    }}
+    }
 
 #else
     #error "This OS Does not support cluster.h"

@@ -57,7 +57,7 @@ namespace nodepp { struct path_t {
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace _path_ { 
+namespace nodepp::_path_ {
 inline map_t<string_t,string_t>& mimetype() {
 static map_t<string_t,string_t>  out ({
 
@@ -128,11 +128,11 @@ static map_t<string_t,string_t>  out ({
     { "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
     { "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" }
 
-}); return out; }}}
+}); return out; }}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace path {
+namespace nodepp::path {
 
     inline string_t normalize( string_t path ){
         static regex_t reg0 = regex_t( PATH_SEL );
@@ -315,7 +315,7 @@ namespace nodepp { namespace path {
       return normalize( string::join( PATH_SEP, argc, args... ) );
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

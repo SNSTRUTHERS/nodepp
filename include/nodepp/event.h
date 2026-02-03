@@ -14,6 +14,13 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+#include "function.h"
+#include "queue.h"
+#include "task.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { template< class... A > class event_t {
 protected:
 

@@ -19,8 +19,8 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace os {
-    
+namespace nodepp::os {
+
     inline string_t hostname(){
         char buffer[UNBFF_SIZE]; DWORD bufferSize = UNBFF_SIZE;
         GetComputerNameA(buffer,&bufferSize); return string_t( buffer, bufferSize );
@@ -63,12 +63,12 @@ namespace nodepp { namespace os {
     /*─······································································─*/
 
     inline uint pid(){ return GetCurrentProcessId(); }
-    
+
     /*─······································································─*/
 
     inline DWORD error(){ return GetLastError(); }
-    
-}}
+
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

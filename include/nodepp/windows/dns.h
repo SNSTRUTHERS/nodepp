@@ -21,9 +21,9 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace dns { 
-    
-    inline bool is_ipv4( const string_t& URL ){ 
+namespace nodepp::dns {
+
+    inline bool is_ipv4( const string_t& URL ){
         thread_local static regex_t reg ( "([0-9]+\\.)+[0-9]+" );
         reg.clear_memory(); return reg.test( URL ) ? 1 : 0; 
     }
@@ -113,16 +113,16 @@ namespace nodepp { namespace dns {
 
         return socket.get_sockname();
     }
-    
+
     /*─······································································─*/
 
-    inline bool is_ip( const string_t& URL ){ 
+    inline bool is_ip( const string_t& URL ){
         if( URL.empty() )     { return 0; }
         if( is_ipv4(URL) > 0 ){ return 1; }
         if( is_ipv6(URL) > 0 ){ return 1; } return 0;
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

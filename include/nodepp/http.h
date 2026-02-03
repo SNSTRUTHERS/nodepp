@@ -235,7 +235,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace http {
+namespace nodepp::http {
 
     inline tcp_t server( function_t<void,http_t> cb, agent_t* opt=nullptr ){
         return tcp_t([=]( http_t cli ){
@@ -277,7 +277,7 @@ namespace nodepp { namespace http {
 
     }); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

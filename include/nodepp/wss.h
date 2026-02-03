@@ -50,7 +50,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace wss {
+namespace nodepp::wss {
 
     inline tls_t server( const tls_t& skt ){ skt.onSocket([=]( ssocket_t raw ){
 
@@ -96,7 +96,7 @@ namespace nodepp { namespace wss {
 
     }); skt.connect( url::hostname(uri), url::port(uri) ); return skt; }
 
-}}
+}
 
 #undef NODEPP_WS_SECRET
 #endif

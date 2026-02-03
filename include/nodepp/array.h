@@ -427,8 +427,8 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace string {
-    
+namespace nodepp::string {
+
     template< class T >
     array_t<T> operator+( const array_t<T>& A, const array_t<T>& B ){
         if( A.empty() ){ return B; } if( B.empty() ){ return A; }
@@ -461,7 +461,7 @@ namespace nodepp { namespace string {
         return out.data();
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
