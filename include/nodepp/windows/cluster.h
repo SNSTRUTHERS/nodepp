@@ -14,6 +14,13 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "../coroutine.h"
+#include "../env.h"
+#include "../fs.h"
+#include "../initializer.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { class cluster_t : public generator_t {
 protected:
 

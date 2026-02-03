@@ -14,6 +14,12 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "../coroutine.h"
+#include "../fs.h"
+#include "../initializer.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { class popen_t : public generator_t {
 protected:
 
