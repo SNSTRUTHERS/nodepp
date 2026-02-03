@@ -426,7 +426,7 @@ public:
 
     socket_t() noexcept : obj( new NODE() ) { _socket_::start_device(); }
 
-   ~socket_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
+    virtual ~socket_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
 
     /*─······································································─*/
 

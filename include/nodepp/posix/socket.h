@@ -412,7 +412,7 @@ public:
         obj->fd = fd; set_nonbloking_mode(); set_buffer_size(_size);
     }
 
-   ~socket_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
+    virtual ~socket_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
 
     socket_t() noexcept : obj( new NODE() ) { _socket_::start_device(); }
 
