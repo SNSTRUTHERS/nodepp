@@ -28,7 +28,7 @@ private:
 protected:
 
     struct NODE {
-        T   callback; 
+        T   callback;
         ulong time=0;
         int state =0;
         bool alive=1;
@@ -55,7 +55,7 @@ public:
     bool is_closed() const noexcept { return !is_available(); }
 
     bool is_available() const noexcept { return obj->alive; }
-    
+
     /*─······································································─*/
 
     coEmit() const { return next(); }
@@ -69,7 +69,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp    { 
+namespace nodepp    {
 struct co_state_t   { uint   flag =0; ulong delay=0; int state=0; };
 struct generator_t  { ulong _time_=0; int _state_=0; };
 namespace coroutine { enum STATE {
@@ -91,20 +91,20 @@ namespace nodepp::coroutine {
 
 namespace nodepp::coroutine {
     inline co_state_t getno( int state=0, int _state_=0, ulong time=0 ){
-    thread_local static co_state_t tmp; co_state_t out; 
-    
+    thread_local static co_state_t tmp; co_state_t out;
+
     memcpy( &out, &tmp, sizeof(co_state_t) ); tmp = co_state_t {};
 
-    tmp.state=_state_; if( time>0 ){ 
+    tmp.state=_state_; if( time>0 ){
         tmp.delay=time; /*------------*/
-        tmp.flag =STATE::CO_STATE_DELAY; goto DONE; 
+        tmp.flag =STATE::CO_STATE_DELAY; goto DONE;
     } switch(state) {
         case -1: tmp.flag=STATE::CO_STATE_END  ; break;
         case  0: tmp.flag=STATE::CO_STATE_BLOCK; break;
         case  1: tmp.flag=STATE::CO_STATE_YIELD; break;
         default: tmp.flag=STATE::CO_STATE_START; break;
-    }   
-    
+    }
+
     DONE:; return out; }
 }
 

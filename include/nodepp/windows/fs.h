@@ -185,7 +185,7 @@ namespace nodepp::fs {
     /*─······································································─*/
 
     inline void read_folder( const string_t& path, function_t<void,string_t> cb ){
-        if( path.empty() ){ return; } 
+        if( path.empty() ){ return; }
 
         auto findData = type::bind( new WIN32_FIND_DATAA() );
         memset( &findData, 0, sizeof(WIN32_FIND_DATAA) );
@@ -208,7 +208,7 @@ namespace nodepp::fs {
 
         coFinish
         }));
-        
+
     }
 
     /*─······································································─*/

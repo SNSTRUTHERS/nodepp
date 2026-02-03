@@ -31,9 +31,9 @@ namespace nodepp::process {
 namespace nodepp { class cluster_t : public generator_t {
 protected:
 
-    void kill() const noexcept { 
+    void kill() const noexcept {
     if( obj->fd != -1 ){ if( is_parent() ){
-        ::kill( obj->fd, SIGKILL ); 
+        ::kill( obj->fd, SIGKILL );
     } } obj->state |= STATE::FS_STATE_KILL; }
 
     using _read_ = generator::file::read;
@@ -73,18 +73,18 @@ protected:
     void _init_( T& arg, T& env ) {
 
         if( process::is_child() ){
-            obj->input = fs::std_output(); obj->error = fs::std_error(); 
-            obj->output= fs::std_input (); set_state( STATE::FS_STATE_OPEN ); 
+            obj->input = fs::std_output(); obj->error = fs::std_error();
+            obj->output= fs::std_input (); set_state( STATE::FS_STATE_OPEN );
         return; }
 
         int fda[2]; if( ::pipe( fda )==-1 ){ throw except_t( "while piping stdin"  ); }
         int fdb[2]; if( ::pipe( fdb )==-1 ){ throw except_t( "while piping stdout" ); }
-        int fdc[2]; if( ::pipe( fdc )==-1 ){ throw except_t( "while piping stderr" ); } 
-        
+        int fdc[2]; if( ::pipe( fdc )==-1 ){ throw except_t( "while piping stderr" ); }
+
         obj->fd = ::fork();
 
         if( obj->fd == 0 ){
-            auto chl = string::format( "CHILD=TRUE", fda[0], fdb[1] ); 
+            auto chl = string::format( "CHILD=TRUE", fda[0], fdb[1] );
             arg.unshift( process::args[0].c_str() ); /*------*/ env.push( chl.c_str() );
             ::dup2( fda[0], STDIN_FILENO  ); ::close( fda[1] ); arg.push( nullptr );
             ::dup2( fdb[1], STDOUT_FILENO ); ::close( fdb[0] ); env.push( nullptr );
@@ -117,7 +117,7 @@ public:
     event_t<string_t>  onDout;
     event_t<string_t>  onDerr;
 
-    cluster_t( const initializer_t<string_t>& args, const initializer_t<string_t>& envs ) 
+    cluster_t( const initializer_t<string_t>& args, const initializer_t<string_t>& envs )
     : obj( new NODE() ) {
         array_t<const char*> arg; array_t<const char*> env;
         for( auto x : args ) { arg.push( x.get() ); } /*---------------*/
@@ -130,7 +130,7 @@ public:
     }
 
     cluster_t() : obj( new NODE() ) {
-        array_t<const char*> arg; array_t<const char*> env; 
+        array_t<const char*> arg; array_t<const char*> env;
         _init_( arg, env ); /*---------------------------*/
     }
 
@@ -139,7 +139,7 @@ public:
     /*─······································································─*/
 
     void free() const noexcept {
-        
+
         if( is_state( STATE::FS_STATE_REUSE ) && obj.count()>1 ){ return; }
         if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
@@ -147,10 +147,10 @@ public:
 
     /*
         obj->input.close(); obj->output.close();
-        obj->error.close(); 
+        obj->error.close();
     */
 
-        onResume.clear(); onError.clear(); 
+        onResume.clear(); onError.clear();
         onDerr  .clear(); onOpen .clear();
         onData  .clear(); onDout .clear(); onClose.emit();
 
@@ -162,21 +162,21 @@ public:
         if( is_closed() ){ free(); int c = 0;
         if( ::waitpid( obj->fd, &c, WNOHANG )<0 )
           { /*unused*/ } return -1; }
-    coBegin ; onOpen.emit(); 
-    
-        coYield(1); coDelay( 100 ); do { 
+    coBegin ; onOpen.emit();
+
+        coYield(1); coDelay( 100 ); do {
         if((*_read1)(&readable())==1)  { coGoto(2); }
         if(  _read1->state <= 0 )      { coGoto(2); }
         onData.emit(_read1->data);
-        onDout.emit(_read1->data); coNext; } while(1);   
-        
+        onDout.emit(_read1->data); coNext; } while(1);
+
         coYield(2); coDelay( 100 ); do {
         if( process::is_child() )      { coGoto(1); }
         if((*_read2)(&std_error())==1 ){ coGoto(1); }
         if(  _read2->state <= 0 )      { coGoto(1); }
         onData.emit(_read2->data);
         onDerr.emit(_read2->data); coNext; } while(1);
-        
+
     coGoto(1); coFinish
     }
 
@@ -185,7 +185,7 @@ public:
     bool is_alive() const noexcept {
         if( is_parent() && ::kill( obj->fd , 0 ) ==-1 ){ return false; }
         if( readable ().is_available() ){ return true; }
-        if( std_error().is_available() ){ return true; } return false; 
+        if( std_error().is_available() ){ return true; } return false;
     }
 
     /*─······································································─*/
@@ -204,7 +204,7 @@ public:
 
     void close() const noexcept {
         if( is_state ( STATE::FS_STATE_DISABLE) ){ return; }
-            set_state( STATE::FS_STATE_CLOSE  ) ; DONE:;
+            set_state( STATE::FS_STATE_CLOSE  ) ; [[maybe_unused]]DONE:;
     onDrain.emit(); free(); }
 
     /*─······································································─*/

@@ -55,9 +55,9 @@ public:
 
    ~mutex_t() noexcept {
         if( obj->alive == 0 ){ return; }
-        if( obj.count() > 1 ){ return; } 
+        if( obj.count() > 1 ){ return; }
     free(); }
-    
+
     /*─······································································─*/
 
     void free() const noexcept {
@@ -65,20 +65,20 @@ public:
         /*--------------*/ obj->alive=0;
         pthread_mutex_destroy(&obj->fd);
     }
-    
+
     /*─······································································─*/
 
     template< class T, class... V >
-    int operator() ( T callback, const V&... args ) const noexcept { 
-        return emit( callback, args... ); 
+    int operator() ( T callback, const V&... args ) const noexcept {
+        return emit( callback, args... );
     }
-    
+
     /*─······································································─*/
 
     template< class T, class... V >
     inline int emit( T callback, const V&... args ) const noexcept {
         if( obj->alive == 0 ){ return -1; }
-        lock  (); int c=callback( args... ); 
+        lock  (); int c=callback( args... );
         unlock(); /*------------*/ return c;
     }
 
@@ -87,14 +87,14 @@ public:
         if( obj->alive == 0 ){ return -1; }
         if( !_lock() ) /*-*/ { return -2; }
         int c=callback( args... ); unlock(); return c;
-    } 
-    
+    }
+
     /*─······································································─*/
 
     template< class T, class... V >
     inline void lock( T callback, const V&... args ) const noexcept {
         if( obj->alive == 0 ) /**/ { return; }
-        lock(); callback( args... ); unlock(); 
+        lock(); callback( args... ); unlock();
     }
 
     template< class T, class... V >
@@ -102,7 +102,7 @@ public:
         if( obj->alive == 0 ){ return -1; }
         if( !_lock() ) /*-*/ { return -2; }
         callback( args... ); unlock(); return 1;
-    } 
+    }
 
     /*─······································································─*/
 
@@ -110,12 +110,12 @@ public:
         return ( pthread_mutex_unlock( &obj->fd ) == 0 ) ? 1 : -1;
     }
 
-    int _lock() const noexcept { 
+    int _lock() const noexcept {
         int res = pthread_mutex_trylock( &obj->fd );
         if( res == 0 )    { return  1; }
         if( res == EBUSY ){ return -2; } return -1;
     }
-    
+
     /*─······································································─*/
 
     void lock  () const noexcept { pthread_mutex_lock( &obj->fd ); }

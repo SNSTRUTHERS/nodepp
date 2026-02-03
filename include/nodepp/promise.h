@@ -125,13 +125,13 @@ public:
           { return obj->value.template as<T>();  }
         if( obj->state & PROMISE_STATE::REJECTED )
           { return obj->value.template as<V>();  }
-        
+
         if( obj->state & PROMISE_STATE::FINISHED )
           { throw except_t( "invalid value" ); }
       elif( obj->state & PROMISE_STATE::CLOSED )
           { throw except_t( "promise is closed" ); }
       elif( obj->state & PROMISE_STATE::PENDING )
-          { throw except_t( "promise still pending" ); } 
+          { throw except_t( "promise still pending" ); }
       else{ throw except_t( "something went wrong"  ); }
 
     }
@@ -152,14 +152,14 @@ public:
         if( obj->state&( PROMISE_STATE::FINISHED  |
             /*--------*/ PROMISE_STATE::CLOSED    |
             /*--------*/ PROMISE_STATE::PENDING  )){ break; }
-            
-    invoke(); } while(0); 
+
+    invoke(); } while(0);
 
         auto self = type::bind(this); process::await([=](){
-            while( self->is_pending() ){ return  1; } 
+            while( self->is_pending() ){ return  1; }
             /*------------------------*/ return -1;
-        }); return get_value(); 
-    
+        }); return get_value();
+
     }
 
     /*─······································································─*/
@@ -172,8 +172,8 @@ public:
             /*--------*/ PROMISE_STATE::PENDING  )){ return; }
 
         auto self = type::bind( this );
-        obj->tsk  = process::add([=](){ 
-             self->invoke(); return -1; 
+        obj->tsk  = process::add([=](){
+             self->invoke(); return -1;
         });
 
     }
@@ -206,7 +206,7 @@ public:
         if( obj->state&( PROMISE_STATE::FINISHED  |
             /*--------*/ PROMISE_STATE::CLOSED   )){ return (*this); }
 
-        obj->fin_clb.once(cb); return (*this); 
+        obj->fin_clb.once(cb); return (*this);
     }
 
 };}
@@ -252,8 +252,8 @@ namespace nodepp::promise {
             if( x & PROMISE_STATE::RESOLVED ){ *idx-=1;continue; }
             if( x & PROMISE_STATE::REJECTED )
               { rej( except_t( "there are rejected promises" ) ); coEnd; }
-            *idx = *idx==1 ? prom.size()-1 : *idx-1 ; } 
-            
+            *idx = *idx==1 ? prom.size()-1 : *idx-1 ; }
+
             res( prom );
 
         coFinish
@@ -276,8 +276,8 @@ namespace nodepp::promise {
             while( *idx != 0 ){ auto x = prom[ *idx ].get_state();
             if( x & PROMISE_STATE::RESOLVED ){ res(prom); coEnd; }
             if( x & PROMISE_STATE::REJECTED ){ break; }
-            *idx = *idx==1 ? prom.size()-1 : *idx-1 ; } 
-            
+            *idx = *idx==1 ? prom.size()-1 : *idx-1 ; }
+
             rej( except_t( "no fullfiled promises" ) );
 
         coFinish

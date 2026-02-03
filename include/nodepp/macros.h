@@ -32,8 +32,8 @@ template< class T > T clamp( const T& val, const T& _min, const T& _max ){ retur
 #define coNext         do { coErrno(0UL,_LINE_,1); /*-------------------------*/ } while(0);
 #define coYield(VALUE) do { coErrno(0UL, VALUE,1); /*-------------------------*/ } while(0);
 #define coWait(VALUE)  do { while( VALUE ){ /*------------------------*/ coNext;}} while(0);
-#define coEnd          do { _time_=0; _state_=_time_; /**/ coroutine::getno(-1); } while(0); return -1;
-#define coStop            } _time_=0; _state_=_time_; /**/ coroutine::getno(-1); } while(0); return -1;
+#define coEnd          do { _time_=0; _state_=(int)_time_; /**/ coroutine::getno(-1); } while(0); return -1;
+#define coStop            } _time_=0; _state_=(int)_time_; /**/ coroutine::getno(-1); } while(0); return -1;
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
@@ -275,7 +275,7 @@ using null_t = decltype( nullptr );
 /*────────────────────────────────────────────────────────────────────────────*/
 
 #if _OS_ == NODEPP_OS_WINDOWS
-#define WIN32_LEAN_AND_MEAN 
+#define WIN32_LEAN_AND_MEAN
 #define sscanff( BUFFER, FORMAT, ... ) sscanf_s( BUFFER, FORMAT, __VA_ARGS__ )
 #else
 #define sscanff( BUFFER, FORMAT, ... ) sscanf  ( BUFFER, FORMAT, __VA_ARGS__ )

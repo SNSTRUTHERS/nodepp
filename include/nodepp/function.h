@@ -12,18 +12,21 @@
 #ifndef NODEPP_FUNCTION
 #define NODEPP_FUNCTION
 
+#include "macros.h"
+#include "ptr.h"
+
 /*────────────────────────────────────────────────────────────────────────────*/
 
 namespace nodepp { template< class V, class... T > class function_t {
 public:
-    
+
     template< class F >
     function_t( F f ) : func_ptr( new func_impl<F>(f) ) {}
 
     function_t( null_t ) noexcept : func_ptr(nullptr) {}
-   
+
     function_t() noexcept : func_ptr(nullptr) {}
-    
+
     /*─······································································─*/
 
     bool has_value() const noexcept { return func_ptr.has_value(); }
@@ -31,27 +34,27 @@ public:
     bool     empty() const noexcept { return func_ptr.null (); }
     bool      null() const noexcept { return func_ptr.null (); }
     void      free() const noexcept { /*--*/ func_ptr.free (); }
-    
+
     /*─······································································─*/
 
     explicit operator bool(void)    const noexcept { return func_ptr.null(); }
-    
+
     V operator()( const T&... arg ) const /*----*/ { return emit( arg... );  }
-    
-    V emit( const T&... arg ) const { 
+
+    V emit( const T&... arg ) const {
         if( !has_value() ){ return V(); }
-        return func_ptr->invoke( arg... ); 
+        return func_ptr->invoke( arg... );
     }
-    
+
 private:
 
     class func_base { public:
         virtual ~func_base() { /*-----------------*/ }
         virtual V invoke( const T&... arg ) const = 0;
     };
-    
+
     /*─······································································─*/
-    
+
     template< class F >
     class func_impl : public func_base {
 
@@ -63,11 +66,11 @@ private:
     private:
         F func;
     };
-    
+
     /*─······································································─*/
-    
+
     ptr_t<func_base> func_ptr;
-    
+
 };}
 
 /*────────────────────────────────────────────────────────────────────────────*/

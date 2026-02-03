@@ -33,14 +33,14 @@
 namespace nodepp::worker {
 
     template< class V, class... T >
-    void await( V cb, const T&... args ){ 
+    void await( V cb, const T&... args ){
         worker_t wrk( cb, args... ); wrk.await();
     }
-    
+
     template< class V, class... T >
-    worker_t add( V cb, const T&... args ){ 
-        worker_t wrk( cb, args... ); 
-        wrk.add(); return wrk; 
+    worker_t add( V cb, const T&... args ){
+        worker_t wrk( cb, args... );
+        wrk.add(); return wrk;
     }
 
 }

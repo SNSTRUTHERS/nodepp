@@ -27,7 +27,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { class worker_t { 
+namespace nodepp { class worker_t {
 private:
 
     enum STATE {
@@ -47,20 +47,20 @@ protected:
     };  ptr_t<NODE> obj;
 
     static void* callback( void* arg ){
-        auto self = type::cast<worker_t>(arg); 
+        auto self = type::cast<worker_t>(arg);
         self->obj->state.set( STATE::WK_STATE_OPEN );
 
         while( !self->is_closed() && self->obj->cb()>=0 ){
         auto info = coroutine::getno();
-        
-        if( info.delay>0 ){ 
-            worker::delay( info.delay ); 
-        } else { 
+
+        if( info.delay>0 ){
+            worker::delay( info.delay );
+        } else {
             worker::yield();
         }}
 
-        self->obj->state.set( STATE::WK_STATE_CLOSE ); 
-        self->obj->krn->emit(); 
+        self->obj->state.set( STATE::WK_STATE_CLOSE );
+        self->obj->krn->emit();
         self->obj->krn.reset();
 
     delete self; worker::exit(); return nullptr; }
@@ -72,39 +72,39 @@ public:
         auto clb = type::bind(cb);
         obj->cb  = function_t<int>([=](){ return (*clb)(arg...); });
     }
-    
+
     /*─······································································─*/
 
     worker_t() noexcept : obj( new NODE ) {}
 
    ~worker_t() noexcept { if( obj.count()>1 ){ return; } free(); }
-    
+
     /*─······································································─*/
 
     pthread_t pid() const noexcept { return obj->id; }
     void     free() const noexcept { obj->state.set(STATE::WK_STATE_AWAIT); }
     void      off() const noexcept { obj->state.set(STATE::WK_STATE_AWAIT); }
     void    close() const noexcept { obj->state.set(STATE::WK_STATE_AWAIT); }
-    
+
     /*─······································································─*/
 
-    bool is_closed() const noexcept { 
+    bool is_closed() const noexcept {
         char   x = obj->state.get();
         return x ==0x00 || ( x & STATE::WK_STATE_CLOSE );
     }
-    
+
     /*─······································································─*/
 
     int emit() const noexcept {
         if( obj->state.get() != 0x00 ){ return 0; }
-        
+
         obj->krn = type::bind( process::NODEPP_EV_LOOP() );
 
         auto pth = pthread_create( &obj->id, NULL, &callback, (void*) new worker_t(*this) );
-        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id ); 
+        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id );
 
         while( obj->state.get()==0x00 ) { /*unused*/ }
-        
+
     return 1; }
 
     /*─······································································─*/
@@ -114,17 +114,17 @@ public:
     /*─······································································─*/
 
     int await() const noexcept {
-        if( obj->state.get() != 0x00 ){ return 0; } 
-        
+        if( obj->state.get() != 0x00 ){ return 0; }
+
         obj->krn = type::bind( process::NODEPP_EV_LOOP() );
 
         auto pth = pthread_create( &obj->id, NULL, &callback, (void*) new worker_t(*this) );
-        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id ); 
+        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id );
 
         while( obj->state.get()==0x00 ) { /*unused*/ }
         while( obj->state.get()&STATE::WK_STATE_OPEN )
              { process::next(); }
-        
+
     return 1; }
 
 };}
@@ -135,7 +135,7 @@ public:
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { class worker_t { 
+namespace nodepp { class worker_t {
 private:
 
     enum STATE {
@@ -154,15 +154,15 @@ protected:
     };  ptr_t<NODE> obj;
 
     static void* callback( void* arg ){
-        auto self = type::cast<worker_t>(arg); 
+        auto self = type::cast<worker_t>(arg);
         self->obj->state.set( STATE::WK_STATE_OPEN );
 
         while( !self->is_closed() && self->obj->cb()>=0 ){
         auto info = coroutine::getno();
-        
-        if( info.delay>0 ){ 
-            worker::delay( info.delay ); 
-        } else { 
+
+        if( info.delay>0 ){
+            worker::delay( info.delay );
+        } else {
             worker::yield();
         }}
 
@@ -176,43 +176,43 @@ public:
         auto clb = type::bind(cb);
         obj->cb  = function_t<int>([=](){ return (*clb)(arg...); });
     }
-    
+
     /*─······································································─*/
 
     worker_t() noexcept : obj( new NODE ) {}
 
    ~worker_t() noexcept { if( obj.count()>1 ){ return; } free(); }
-    
+
     /*─······································································─*/
 
     pthread_t pid() const noexcept { return obj->id; }
     void     free() const noexcept { obj->state.set(STATE::WK_STATE_AWAIT); }
     void      off() const noexcept { obj->state.set(STATE::WK_STATE_AWAIT); }
     void    close() const noexcept { obj->state.set(STATE::WK_STATE_AWAIT); }
-    
+
     /*─······································································─*/
 
-    bool is_closed() const noexcept { 
+    bool is_closed() const noexcept {
         char   x = obj->state.get();
         return x ==0x00 || ( x & STATE::WK_STATE_CLOSE );
     }
-    
+
     /*─······································································─*/
 
     int emit() const noexcept {
         if( obj->state.get() != 0x00 ){ return 0; } auto self = type::bind( this );
-        
+
         auto pth = pthread_create( &obj->id, NULL, &callback, (void*) &self );
-        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id ); 
-        
+        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id );
+
         process::add( coroutine::add( COROUTINE(){
         coBegin
             while( self->obj->state.get()==0x00 )/**/{ coNext; }
             while( self->obj->state.get()&STATE::WK_STATE_OPEN )
                  { coDelay( 1000 ); }
         coFinish
-        })); 
-        
+        }));
+
     return 1; }
 
     /*─······································································─*/
@@ -223,10 +223,10 @@ public:
 
     int await() const noexcept {
         if( obj->state.get() != 0x00 ){ return 0; } auto self = type::bind( this );
-        
+
         auto pth = pthread_create( &obj->id, NULL, &callback, (void*) &self );
-        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id ); 
-        
+        if ( pth!= 0 ){ return -1; } pthread_detach( obj->id );
+
         process::await( coroutine::add( COROUTINE(){
         coBegin
             while( self->obj->state.get()==0x00 )/**/{ coNext; }
@@ -234,7 +234,7 @@ public:
                  { coDelay( 1000 ); }
         coFinish
         }));
-        
+
     return 1; }
 
 };}

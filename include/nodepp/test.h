@@ -22,13 +22,13 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { class test_t { 
+namespace nodepp { class test_t {
 protected:
 
     struct NODE {
         function_t<int> callback;
         string_t        name;
-    };  
+    };
 
     enum STATE {
          TS_STATE_UNKNOWN = 0b00000000,
@@ -36,9 +36,9 @@ protected:
          TS_STATE_SKIP    = 0b00000010,
          TS_STATE_CLOSED  = 0b00000100,
     };
-    
+
     struct DONE {
-        queue_t<NODE> queue; int state = 0x01; 
+        queue_t<NODE> queue; int state = 0x01;
     };  ptr_t<DONE> obj;
 
 public:
@@ -53,10 +53,10 @@ public:
    ~test_t() noexcept {
         if( obj.count()> 1 ) /*---------------*/ { return; }
         if( obj->state & STATE::TS_STATE_CLOSED ){ return; }
-        obj->state = STATE::TS_STATE_CLOSED; onClose.emit(); 
+        obj->state = STATE::TS_STATE_CLOSED; onClose.emit();
     }
 
-    test_t() noexcept : obj( new DONE() ) { 
+    test_t() noexcept : obj( new DONE() ) {
         auto self = type::bind( this );
     }
 
@@ -64,7 +64,7 @@ public:
 
     template< class T >
     void set( const string_t& name, const T& callback ) noexcept {
-        NODE node; 
+        NODE node;
              node.callback = callback;
              node.name     = name;
         obj->queue.push( node );
@@ -75,14 +75,14 @@ public:
     void   ignore() const noexcept { obj->state |= STATE::TS_STATE_SKIP; }
 
     void unignore() const noexcept { obj->state &=~STATE::TS_STATE_SKIP; }
-    
+
     /*─······································································─*/
 
     void await() const noexcept { auto self=type::bind(this);
         if( obj->state & STATE::TS_STATE_CLOSED ){ return; }
 
         process::await( coroutine::add( COROUTINE(){ int c=0;
-        coBegin; 
+        coBegin;
             self->obj->queue.set( self->obj->queue.first() );
         coYield(1);
 
@@ -92,35 +92,35 @@ public:
 
             conio::log("TEST:> "); conio::log( x->data.name );
             c = x->data.callback(); if ( c == 1 ){
-                conio::done( " PASSED\n" ); 
+                conio::done( " PASSED\n" );
                 self->onDone.emit();
             } elif ( c == -1 ) {
-                conio::error( " FAILED\n" ); 
+                conio::error( " FAILED\n" );
                 self->onFail.emit();
             } else {
-                conio::warn( " SKIPPED\n" ); 
+                conio::warn( " SKIPPED\n" );
                 self->onSkip.emit();
             }
 
             } while(0);
 
-            if( self->obj->queue.get()==nullptr )/*--*/{ self->onClose.emit(); coEnd; } 
-            if( self->obj->queue.get()->next==nullptr ){ self->onClose.emit(); coEnd; } 
+            if( self->obj->queue.get()==nullptr )/*--*/{ self->onClose.emit(); coEnd; }
+            if( self->obj->queue.get()->next==nullptr ){ self->onClose.emit(); coEnd; }
                 self->obj->queue.next();
-              
+
         coGoto(1) ; coFinish
         }));
 
     }
-    
+
     /*─······································································─*/
 
     void run() const noexcept { auto self=type::bind( this );
         if( obj->state & STATE::TS_STATE_CLOSED ){ return; }
 
         process::add( coroutine::add( COROUTINE(){ int c=0;
-        coBegin; 
-            self->obj->queue.set( self->obj->queue.first() ); 
+        coBegin;
+            self->obj->queue.set( self->obj->queue.first() );
         coYield(1);
 
             if( self->obj->state & STATE::TS_STATE_SKIP ){ coEnd; } do {
@@ -129,22 +129,22 @@ public:
 
             conio::log("TEST:> "); conio::log( x->data.name );
             c = x->data.callback(); if ( c == 1 ){
-                conio::done( " PASSED\n" ); 
+                conio::done( " PASSED\n" );
                 self->onDone.emit();
             } elif ( c == -1 ) {
-                conio::error( " FAILED\n" ); 
+                conio::error( " FAILED\n" );
                 self->onFail.emit();
             } else {
-                conio::warn( " SKIPPED\n" ); 
+                conio::warn( " SKIPPED\n" );
                 self->onSkip.emit();
             }
 
             } while(0);
 
-            if( self->obj->queue.get()==nullptr )/*--*/{ self->onClose.emit(); coEnd; } 
-            if( self->obj->queue.get()->next==nullptr ){ self->onClose.emit(); coEnd; } 
+            if( self->obj->queue.get()==nullptr )/*--*/{ self->onClose.emit(); coEnd; }
+            if( self->obj->queue.get()->next==nullptr ){ self->onClose.emit(); coEnd; }
                 self->obj->queue.next();
-              
+
         coGoto(1) ; coFinish
         }));
 
@@ -180,7 +180,7 @@ public:
 
 #define TEST_FAIL() return -1
 
-#define TEST_DONE() return  1 
+#define TEST_DONE() return  1
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

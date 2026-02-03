@@ -33,12 +33,12 @@ namespace nodepp::process {
         } else {
             for( auto &x: query::parse( args[i] ).data() )
                { env::set( x.first, x.second ); }
-        }} while( i ++< argc - 1 ); signal::start(); 
+        }} while( i ++< argc - 1 ); signal::start();
     }
 
     /*─······································································─*/
 
-    inline void stop(){ 
+    inline void stop(){
         while( !process::should_close() ){
             process::next( );
         }   process::exit(0);

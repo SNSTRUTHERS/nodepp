@@ -23,7 +23,7 @@
 namespace nodepp { class file_t {
 protected:
 
-    void kill() const noexcept { 
+    void kill() const noexcept {
         obj->state |= STATE::FS_STATE_KILL;
         CancelIoEx((HANDLE)obj->fd, &obj->ovr);
         CancelIoEx((HANDLE)obj->fd, &obj->ovw);
@@ -60,21 +60,21 @@ protected:
         ulong       offset   = 0;
         int         feof     = 1;
         uchar       state    = STATE::FS_STATE_OPEN;
-        
+
         ptr_t<char> buffer; string_t borrow;
     };  ptr_t<NODE> obj;
-    
+
     /*─······································································─*/
 
-    bool is_std() const noexcept { 
+    bool is_std() const noexcept {
         return obj->fd == GetStdHandle( STD_INPUT_HANDLE ) ||
                obj->fd == GetStdHandle( STD_OUTPUT_HANDLE) ||
                obj->fd == GetStdHandle( STD_ERROR_HANDLE ) ;
     }
-    
+
     /*─······································································─*/
 
-    ptr_t<uint> get_fd_flag( const string_t& flag ){ 
+    ptr_t<uint> get_fd_flag( const string_t& flag ){
         ptr_t<uint> fg ({ 0x00, FILE_SHARE_READ|FILE_SHARE_WRITE, 0x00, FILE_FLAG_OVERLAPPED });
         if  ( flag == "r"  ){ fg[0] |= GENERIC_READ;               fg[2] |= OPEN_EXISTING; }
         elif( flag == "w"  ){ fg[0] |= GENERIC_WRITE;              fg[2] |= CREATE_ALWAYS; }
@@ -85,11 +85,11 @@ protected:
         else                { fg[0] |= GENERIC_READ|GENERIC_WRITE; fg[2] |= OPEN_EXISTING; }
         return  fg;
     }
-    
+
     /*─······································································─*/
-    
+
     int set_nonbloking_mode() const noexcept { return 0; }
-    
+
     /*─······································································─*/
 
     bool is_blocked( bool mode, DWORD& c ) const noexcept {
@@ -106,7 +106,7 @@ protected:
 
     DONE:; obj->state &= ~state; obj->offset+= c;
     return 0; }
-    
+
 public:
 
     event_t<>          onUnpipe;
@@ -117,20 +117,20 @@ public:
     event_t<>          onOpen;
     event_t<>          onPipe;
     event_t<string_t>  onData;
-    
+
     /*─······································································─*/
 
     file_t( const string_t& path, const string_t& mode, const ulong& _size=CHUNK_SIZE ) : obj( new NODE() ) {
-        auto fg = get_fd_flag( mode ); obj->fd = CreateFileA( path.c_str(), fg[0], fg[1], NULL, fg[2], fg[3], NULL ); 
+        auto fg = get_fd_flag( mode ); obj->fd = CreateFileA( path.c_str(), fg[0], fg[1], NULL, fg[2], fg[3], NULL );
         if( obj->fd == INVALID_HANDLE_VALUE ){ throw except_t("such file or directory does not exist"); }
-        set_nonbloking_mode(); set_buffer_size( _size ); 
+        set_nonbloking_mode(); set_buffer_size( _size );
     }
 
     file_t( const HANDLE& fd, const ulong& _size=CHUNK_SIZE ) : obj( new NODE() ) {
         if( fd == INVALID_HANDLE_VALUE ){ throw except_t("such file or directory does not exist"); }
-        obj->fd = fd; set_nonbloking_mode(); set_buffer_size( _size ); 
+        obj->fd = fd; set_nonbloking_mode(); set_buffer_size( _size );
     }
- 
+
    ~file_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
 
     file_t() noexcept : obj( new NODE() ) {}
@@ -156,13 +156,13 @@ public:
     void    stop() const noexcept { if(is_state(STATE::FS_STATE_REUSE)){ return; } set_state(STATE::FS_STATE_REUSE); onDrain .emit(); }
     void   reset() const noexcept { if(is_state(STATE::FS_STATE_KILL )){ return; } resume(); pos(0); }
     void   flush() const noexcept { obj->buffer.fill(0); }
-    
+
     /*─······································································─*/
 
     void   set_range( ulong x, ulong y ) const noexcept { obj->range[0] = x; obj->range[1] = y; }
     ulong* get_range() const noexcept { return obj == nullptr ? nullptr : obj->range; }
     HANDLE    get_fd() const noexcept { return obj == nullptr ? nullptr : obj->fd; }
-    
+
     /*─······································································─*/
 
     void   set_borrow( const string_t& brr ) const noexcept { obj->borrow = brr; }
@@ -170,13 +170,13 @@ public:
     char*  get_borrow_data() const noexcept { return obj->borrow.data(); }
     void        del_borrow() const noexcept { obj->borrow.clear(); }
     string_t&   get_borrow() const noexcept { return obj->borrow; }
-    
+
     /*─······································································─*/
 
     ulong   get_buffer_size() const noexcept { return obj->buffer.size(); }
     char*   get_buffer_data() const noexcept { return obj->buffer.data(); }
     ptr_t<char>& get_buffer() const noexcept { return obj->buffer; }
-    
+
     /*─······································································─*/
 
     ulong pos( ulong _pos ) const noexcept { obj->offset = _pos; return _pos; }
@@ -186,13 +186,13 @@ public:
     }
 
     ulong pos() const noexcept { return obj->offset; }
-    
+
     /*─······································································─*/
 
-    ulong set_buffer_size( ulong _size ) const noexcept { 
+    ulong set_buffer_size( ulong _size ) const noexcept {
         obj->buffer = ptr_t<char>( _size ); return _size;
     }
-    
+
     /*─······································································─*/
 
     void free() const noexcept {
@@ -201,13 +201,13 @@ public:
         if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
           { kill(); onDrain.emit(); } else { kill(); }
-       
+
         onUnpipe.clear(); onResume.clear();
         onError .clear(); onData  .clear();
         onOpen  .clear(); onPipe  .clear(); onClose.emit();
 
     }
-    
+
     /*─······································································─*/
 
     char read_char() const noexcept { return read(1)[0]; }
@@ -232,7 +232,7 @@ public:
              { process::next(); }
         return gen.data;
     }
-    
+
     /*─······································································─*/
 
     string_t read( ulong size=CHUNK_SIZE ) const noexcept {
@@ -248,20 +248,20 @@ public:
              { process::next(); }
         return gen.data;
     }
-    
+
     /*─······································································─*/
 
     virtual int _read ( char* bf, const ulong& sx ) const noexcept { return __read ( bf, sx ); }
     virtual int _write( char* bf, const ulong& sx ) const noexcept { return __write( bf, sx ); }
-    
+
     /*─······································································─*/
 
     virtual int __read( char* bf, const ulong& sx ) const noexcept {
         if( is_closed() ){ return -1; } if( sx==0 ){ return 0; } DWORD c=0;
 
-        if( obj->state & STATE::FS_STATE_READING ){ 
+        if( obj->state & STATE::FS_STATE_READING ){
         if( is_blocked( false, c ) ){ return -2; }
-            obj->feof = (int)c; return obj->feof; 
+            obj->feof = (int)c; return obj->feof;
         }
 
         memset( &obj->ovr, 0, sizeof(OVERLAPPED) );
@@ -279,7 +279,7 @@ public:
 
         if( obj->state & STATE::FS_STATE_WRITING ){
         if( is_blocked( true, c ) ){ return -2; }
-            obj->feof = (int)c; return obj->feof; 
+            obj->feof = (int)c; return obj->feof;
         }
 
         memset( &obj->ovw, 0, sizeof(OVERLAPPED) );
@@ -288,7 +288,7 @@ public:
 
         obj->feof = WriteFile( obj->fd, bf, sx, &c, &obj->ovw );
         obj->feof = is_blocked( true, c ) ? -2 : (int) c;
-    
+
     if( obj->feof <= 0 && obj->feof != -2 ){ return -1; }
     return obj->feof; }
 
@@ -309,7 +309,7 @@ public:
             if( c >  0 ){ *sy+= c; continue; } return 1;
         }   return 0;
     }
-    
+
 };}
 
 /*────────────────────────────────────────────────────────────────────────────*/

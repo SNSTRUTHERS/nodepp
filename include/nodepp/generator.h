@@ -83,7 +83,7 @@ namespace nodepp::generator::file {
         if( pos < r[0] ){ str->del_borrow(); str->pos(r[0]); }
       elif( pos >=r[1] ){ coEnd; } } else { d = str->get_buffer_size(); }
 
-        if( data.empty() ){ 
+        if( data.empty() ){
             coWait((state=str->_read(str->get_buffer_data(),min(d,size)))==-2);
         if( state<=0 ){ coEnd; }
         if( state >0 ){ data=string_t(str->get_buffer_data(),(ulong)state); }}
@@ -214,16 +214,16 @@ namespace nodepp::generator::ssl {
             if( err == SSL_ERROR_WANT_READ ){
 
                 d=stream->socket_t::__read( &bff, bff.size() );
-                if( d > 0 ){ 
+                if( d > 0 ){
                 if( bff[0]!=0x16 && x==0 ){ stream->close(); coEnd; }
                     BIO_write( obj->rbio, &bff, d ); x=1;
                     c=SSL_read( obj->ssl, &bff, 0 ); }
                 if( d < 0 && d != -2 ){ c=-1; coEnd; }
 
             }
-            
+
             if( err == SSL_ERROR_WANT_WRITE ||
-                err == SSL_ERROR_WANT_READ        
+                err == SSL_ERROR_WANT_READ
             ) { coGoto(0); }
 
         coFinish }
@@ -250,11 +250,11 @@ namespace nodepp::generator::stream {
     public:
 
         template< class T, class V > coEmit( const T& inp, const V& out ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
             out.onPipe.emit(); out.resume();
-        
+
         coYield(1);
 
             while( inp.is_available() && out.is_available() ){
@@ -290,8 +290,8 @@ namespace nodepp::generator::stream {
     public:
 
         template< class T > coEmit( const T& inp ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
 
             while( inp.is_available() ){
@@ -303,7 +303,7 @@ namespace nodepp::generator::stream {
         coFinish }
 
         template< class T, class V > coEmit( const T& inp, const V& out ){
-        coBegin 
+        coBegin
 
             inp.onPipe.emit(); inp.resume();
             out.onPipe.emit(); out.resume();
@@ -332,25 +332,25 @@ namespace nodepp::generator::stream {
 
         template< class T, class U >
         coEmit( const T& inp, const U& val ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
-            
+
             while( inp.is_available() ){
            coWait( _read(&inp,val)==1 );
                if( _read.state <=0 ){ break; }
                    inp.onData.emit(_read.data);
             }      inp.stop();
-        
+
         coFinish }
 
         template< class T, class V, class U >
         coEmit( const T& inp, const V& out, const U& val ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
             out.onPipe.emit(); out.resume();
-            
+
             while( inp.is_available() && out.is_available() ){
            coWait( _read(&inp,val)==1 );
                if( _read.state  <=0 ){ break; }
@@ -358,7 +358,7 @@ namespace nodepp::generator::stream {
                if( _write.state <=0 ){ break; }
                     inp.onData.emit(_read.data);
             }       inp.stop(); out.stop();
-        
+
         coFinish }
 
     };
@@ -374,24 +374,24 @@ namespace nodepp::generator::stream {
     public:
 
         template< class T > coEmit( const T& inp ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
-        
+
             while( inp.is_available() ){
            coWait( _read(&inp)==1 );
                if( _read.state<=0 ){ break;  }
                    inp.onData.emit(_read.data);
             }      inp.stop();
-        
+
         coFinish }
 
         template< class T, class V > coEmit( const T& inp, const V& out ){
-        coBegin 
-            
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
             out.onPipe.emit(); out.resume();
-        
+
             while( inp.is_available() && out.is_available() ){
            coWait( _read(&inp) ==1 );
                if( _read.state <=0 ){ break;  }
@@ -399,7 +399,7 @@ namespace nodepp::generator::stream {
                if( _write.state<=0 ){ break;  }
                     inp.onData.emit(_read.data);
             }       inp.stop(); out.stop();
-        
+
         coFinish }
 
     };
@@ -424,8 +424,8 @@ namespace nodepp::generator::zlib {
     public:
 
         template< class Z, class T, class V > coEmit( const Z& zlb, const T& inp, const V& out ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
             out.onPipe.emit(); out.resume();
 
@@ -441,8 +441,8 @@ namespace nodepp::generator::zlib {
         coFinish }
 
         template< class Z, class T > coEmit( const Z& zlb, const T& inp ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
 
             while( inp.is_available() ){
@@ -466,11 +466,11 @@ namespace nodepp::generator::zlib {
     public:
 
         template< class Z, class T, class V > coEmit( const Z& zlb, const T& inp, const V& out ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
             out.onPipe.emit(); out.resume();
-        
+
             while( inp.is_available() && out.is_available() ){
            coWait( _read(&inp) ==1 );
                if( _read.state <=0 ){ break; }
@@ -479,14 +479,14 @@ namespace nodepp::generator::zlib {
                if( _write.state<=0 ){ break; }
                     inp.onData.emit( borrow );
             }       inp.stop(); out.stop();
-        
+
         coFinish }
 
         template< class Z, class T > coEmit( const Z& zlb, const T& inp ){
-        coBegin 
-        
+        coBegin
+
             inp.onPipe.emit(); inp.resume();
-            
+
             while( inp.is_available() ){
            coWait( _read(&inp)==1 );
                if( _read.state<=0 ){ break; }
@@ -579,7 +579,7 @@ namespace nodepp::generator::ws {
             string_t enc = encoder::base64::get( encoder::buffer::hex2buff(sha.get()) );
 
             if( dta != enc ){
-                cli.onError.emit("secret key does not match"); 
+                cli.onError.emit("secret key does not match");
                 cli.close(); break;
             }   cli.stop (); return true;
 

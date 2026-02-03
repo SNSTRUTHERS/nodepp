@@ -36,19 +36,19 @@ namespace nodepp::conio {
 
     /*─······································································─*/
 
-    inline int perr( const string_t& args ){ 
-        return ::write( STDERR_FILENO, args.get(), args.size() );
+    inline int perr( const string_t& args ){
+        return (int)::write( STDERR_FILENO, args.get(), args.size() );
     }
-    
+
     inline int pout( const string_t& args ){
-        return ::write( STDOUT_FILENO, args.get(), args.size() );
+        return (int)::write( STDOUT_FILENO, args.get(), args.size() );
     }
 
     template< class V, class... T >
-    int scan( const V& argc, const T&... args ){ 
+    int scan( const V& argc, const T&... args ){
         auto bff = string::buffer( UNBFF_SIZE );
         auto len = ::read( STDIN_FILENO, bff.get(), bff.size() );
-        auto data= string_t( &bff, len );
+        auto data= string_t( &bff, (ulong)len );
         return string::parse( data.get(), argc, args... );
     }
 
@@ -57,7 +57,7 @@ namespace nodepp::conio {
     template< class... T >
     int log( const T&... args ){
         auto data = string::join( " ", args... ) + "\033[0m";
-        pout( data ); return data.size();
+        pout( data ); return (int)data.size();
     }
 
     template< class... T >
@@ -67,7 +67,7 @@ namespace nodepp::conio {
     }
 
     /*─······································································─*/
-    
+
     inline int set_position( int x, int y ){ return pout(string::format("\033[%d;%dH",x,y)); }
 
     /*─······································································─*/
@@ -80,7 +80,7 @@ namespace nodepp::conio {
 
     /*─······································································─*/
 
-    inline int background( int state ){ 
+    inline int background( int state ){
         if( state & 0x10 ){ pout("\033[1m"); state &= 0x0f; }
         switch( state )   {
             case color::black:   return pout("\033[40m"); break;

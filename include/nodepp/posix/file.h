@@ -69,7 +69,7 @@ protected:
 
     /*─······································································─*/
 
-    bool is_std() const noexcept { 
+    bool is_std() const noexcept {
         return obj->fd == STDOUT_FILENO ||
                obj->fd == STDIN_FILENO  ||
                obj->fd == STDERR_FILENO ;
@@ -128,7 +128,7 @@ public:
     }
 
    ~file_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
-     
+
     file_t() noexcept : obj( new NODE() ) {}
 
     /*─······································································─*/
@@ -201,12 +201,12 @@ public:
     void free() const noexcept {
 
         if( is_state( STATE::FS_STATE_REUSE ) && obj.count()>1 ){ return; }
-        if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; } 
+        if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
           { kill(); onDrain.emit(); } else { kill(); }
-       
+
         onUnpipe.clear(); onResume.clear();
-        onError .clear(); onData  .clear(); 
+        onError .clear(); onData  .clear();
         onOpen  .clear(); onPipe  .clear(); onClose.emit();
 
     }

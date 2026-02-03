@@ -36,37 +36,37 @@ namespace nodepp::console {
     inline void wait(){ char x; conio::scan("%c",&x); }
 
     inline void clear(){ conio::clear(); }
-    
+
     /*─······································································─*/
 
     template< class... T >
-    int warning( const T&... args ){ 
+    int warning( const T&... args ){
         conio::warn("WARNING: ");
-        return log( args... ); 
+        return log( args... );
     }
 
     template< class... T >
-    int success( const T&... args ){ 
+    int success( const T&... args ){
         conio::done("SUCCESS: ");
-        return log( args... );  
+        return log( args... );
     }
 
     template< class... T >
-    int error( const T&... args ){ 
-        conio::error("ERROR: "); 
-        return log( args... ); 
+    int error( const T&... args ){
+        conio::error("ERROR: ");
+        return log( args... );
     }
 
     template< class... T >
-    int done( const T&... args ){ 
-        conio::done("DONE: "); 
-        return log( args... ); 
+    int done( const T&... args ){
+        conio::done("DONE: ");
+        return log( args... );
     }
 
     template< class... T >
-    int info( const T&... args ){ 
-        conio::info("INFO: "); 
-        return log( args... ); 
+    int info( const T&... args ){
+        conio::info("INFO: ");
+        return log( args... );
     }
 
 }

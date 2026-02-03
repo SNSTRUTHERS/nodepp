@@ -22,7 +22,7 @@
 
 namespace nodepp { class json_t {
 private:
-    
+
     using T     = type::pair<string_t,object_t>;
     using QUEUE = map_t<string_t,object_t>;
     using ARRAY = array_t<object_t>;
@@ -33,13 +33,13 @@ protected:
         uchar k=0; while( _pos < str.size() && k < 128 ){
             switch( str[_pos] ){
                 case ':': k += 6; break; case ',': k -= 6; break;
-                case '{': _pos =get_next_key( _pos, str ); break;
-                case '[': _pos =get_next_key( _pos, str ); break;
-                case '"': _pos =get_next_key( _pos, str ); break;
-                case '\\':_pos =get_next_key( _pos, str ); break;
+                case '{': _pos = (ulong)get_next_key( _pos, str ); break;
+                case '[': _pos = (ulong)get_next_key( _pos, str ); break;
+                case '"': _pos = (ulong)get_next_key( _pos, str ); break;
+                case '\\':_pos = (ulong)get_next_key( _pos, str ); break;
                 case '}':    k =0; break;  case ']': k =0; break;
             }   if( k == 0 ){ break; } ++_pos;
-        }   return _pos >= str.size() ? -1 : _pos;
+        }   return _pos >= str.size() ? -1 : long(_pos);
     }
 
     long get_next_key( ulong _pos, const string_t& str ) const noexcept {
@@ -52,7 +52,7 @@ protected:
                     else   { k-=5; x=!x; }
                 break;
             } if( k == 0 ){ break; } ++_pos;
-        }   return _pos >= str.size() ? -1 : _pos;
+        }   return _pos >= str.size() ? -1 : long(_pos);
     }
 
     object_t get_data( const string_t& data ) const noexcept {
@@ -66,8 +66,8 @@ protected:
         ulong x=0; while( x < data.size() && data[x]==' ' ){ ++x; }
 
         if  ( data.empty() || data[x] == ',' ) /*---*/ { return nullptr; }
-        elif( data[x] == '"'     ) /*---------------*/ { 
-              return data.slice( x+1, get_next_sec( x, data ) ); }
+        elif( data[x] == '"'     ) /*---------------*/ {
+              return data.slice( long(x+1), get_next_sec( x, data ) ); }
         elif( data[x] == '{'     ) /*---------------*/ { return parse( data ); }
         elif( data[x] == '['     ) /*---------------*/ { return parse( data ); }
         elif( data.find("false") ) /*---------------*/ { return (bool) 0; }
@@ -84,14 +84,14 @@ protected:
 
     object_t get_object( ulong x, ulong y, const string_t& str ) const {
         object_t out; do { type::pair<string_t,string_t> data;
-           if( string::is_space(str[x]) ){ continue; }
+           if( string::is_space((uchar)str[x]) ){ continue; }
            if( str[x] == '"' ){
                auto z = get_next_sec( x, str );
-               data.first = str.slice( x+1,z );
+               data.first = str.slice( long(x+1),z );
             while( str[x]!=':' && x<y ){ ++x; }
                auto w = get_next_sec( x, str );
-                    w = w<0 ? str.size()-1 : w;
-               data.second = str.slice( x+1, w); x=w;
+                    w = w<0 ? (long)str.size()-1 : w;
+               data.second = str.slice( long(x+1), w); x=(ulong)w;
                out[data.first] = get_data( data.second );
             }
         } while( x++<y ); return out.keys().empty() ? nullptr : out;
@@ -99,18 +99,18 @@ protected:
 
     ARRAY get_array( ulong x, ulong y, const string_t& str ) const {
         queue_t<object_t> data; do {
-           if( string::is_space(str[x]) || str[x]==',' ){ continue; }
+           if( string::is_space((uchar)str[x]) || str[x]==',' ){ continue; }
            if( str[x] == '{' || str[x] == '[' ){
                auto z = get_next_key( x, str );
            if( z < 0 ){ throw except_t("Invalid JSON Format"); }
-               data.push( parse(str.slice_view( x,z+1 )) ); x=z+1;
+               data.push( parse(str.slice_view( long(x),z+1 )) ); x=(ulong)z+1;
            } elif( str[x] == '"' ) {
                auto z = get_next_sec( x, str );
            if( z < 0 ){ throw except_t("Invalid JSON Format"); }
-               data.push( get_data(str.slice_view( x,z+1 )) ); x=z+1;
+               data.push( get_data(str.slice_view( long(x),z+1 )) ); x=(ulong)z+1;
            } elif( x != y ) {
                ulong z=x; while( str[z]!=',' && z<y ) { ++z; }
-               data.push( get_data(str.slice_view( x, z )) ); x=z;
+               data.push( get_data(str.slice_view( long(x), long(z) )) ); x=z;
            }
         } while( x++<y ); return data.data();
     }
@@ -126,17 +126,17 @@ public: json_t() noexcept {}
             if ( pos < 0 ){ throw except_t("Invalid JSON Format"); }
 
                 if( str[x] == '[' ) {
-                    return get_array( x+1, pos, str );
+                    return get_array( x+1, (ulong)pos, str );
                 } elif( str[x] == '{' ) {
-                    return get_object( x+1,pos, str );
+                    return get_object( x+1,(ulong)pos, str );
                 } else {
-                    data = str.slice_view( x+1, pos-1 ); break;
-                }   x = pos + 1;
+                    data = str.slice_view( long(x+1), pos-1 ); break;
+                }   x = (ulong)pos + 1;
 
             } elif( str[x] == ']' || str[x] == '}' || str[x] == ')' ){
                 throw except_t("Invalid JSON Format");
             } else {
-                if( string::is_space( str[x] ) )
+                if( string::is_space( (uchar)str[x] ) )
                   { continue; } data.push( str[x] );
             }
 
@@ -278,8 +278,8 @@ namespace nodepp::json {
 
 namespace nodepp::json {
     template< class... T >
-    string_t stringify( const T&... args ){ 
-      return format( args... ); 
+    string_t stringify( const T&... args ){
+      return format( args... );
     }
 }
 

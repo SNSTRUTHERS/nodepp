@@ -23,15 +23,15 @@ private:
     static constexpr ulong SSO = ( STACK_SIZE>0 && type::is_trivially_copyable<T>::value ) ? STACK_SIZE : 1;
 
     struct NODE_STACK {
-        ulong /*----------------*/ count; 
+        ulong /*----------------*/ count;
         ulong length; T* value; int flag;
         alignas(T) char stack [SSO];
     };
 
     struct NODE_HEAP {
-        ulong /*------*/ count; 
-        ulong length; T* value; 
-        void* stack; int  flag; 
+        ulong /*------*/ count;
+        ulong length; T* value;
+        void* stack; int  flag;
     };
 
     enum FLAG {
@@ -47,7 +47,7 @@ private:
     /*─······································································─*/
 
     inline int _free_( NODE* address ) const noexcept {
-        
+
         if  ( address /*-*/ ==nullptr ){ return -1; }
         if  ( address->value==nullptr ){ return -1; }
         if  ( address->flag ==0x00    ){ return -1; }
@@ -55,7 +55,7 @@ private:
         if  ( address->flag & FLAG::PTR_FLAG_HEAP ){
         if  ( address->length!= 0 ){ delete [] address->value; }
         else /*-----------------*/ { delete    address->value; }}
-        
+
         address->flag  = FLAG::PTR_FLAG_UNKNOWN;
         address->value = nullptr;
         address->count = 0UL;
@@ -87,7 +87,7 @@ private:
 
         if( N==0 ){ *address->value = *value; }
         else      { type::copy( value, value+N, begin() ); }
-        
+
     return 1; }
 
     inline int _set_( NODE*& address, T* value, ulong N ) noexcept {
@@ -97,7 +97,7 @@ private:
         address->flag &=~FLAG::PTR_FLAG_STACK;
         address->flag |= FLAG::PTR_FLAG_HEAP ;
         address->value = value;
-        
+
     return 1; }
 
     inline int _set_( NODE*& address, ulong N, bool ) noexcept {
@@ -120,7 +120,7 @@ private:
           { address = nullptr; return -1;}
         if( _new_( address, N )    == -1 )
           { address = nullptr; return -1;}
-        
+
     return 1; }
 
     /*─······································································─*/
@@ -138,7 +138,7 @@ private:
 
         if  ( r_size <= SSO && type::is_trivially_copyable<T>::value ){
               address->value= (T*)( address->stack );
-              address->flag|= FLAG::PTR_FLAG_STACK; } 
+              address->flag|= FLAG::PTR_FLAG_STACK; }
         else{ address->flag|= FLAG::PTR_FLAG_HEAP ; }
 
     return 1; }
@@ -157,7 +157,7 @@ private:
 
     inline T* _begin_( NODE* address ) const noexcept {
         if(_null_( address ) ){ return nullptr; }
-    return address->value + offset; } 
+    return address->value + offset; }
 
     inline T* _end_( NODE* address ) const noexcept {
         if(_null_( address ) ){ return nullptr; }
@@ -173,19 +173,19 @@ private:
     return false; }
 
 private:
-    
+
     NODE* address = nullptr;
 
 protected:
 
     void cpy( const ptr_t& other ) noexcept {
          reset(); _cpy_( other.address, address );
-         /*----*/ slice( other.offset, other.limit ); 
+         /*----*/ slice( other.offset, other.limit );
     }
 
     void mve( ptr_t&& other ) noexcept {
          reset(); _mve_( other.address, address );
-         /*----*/ slice( other.offset, other.limit ); 
+         /*----*/ slice( other.offset, other.limit );
     }
 
 public:
@@ -224,7 +224,7 @@ public:
 
     /*─······································································─*/
 
-    T& operator[]( ulong i ) const noexcept { 
+    T& operator[]( ulong i ) const noexcept {
        return !empty() && i<size() ? data()[i] : data()[i%size()];
     }
 
@@ -252,7 +252,7 @@ public:
         if  ( _null_( address ) ){ return nullptr; }
         if  ( count() > 0 && size()==0 )
             { return new T( *data() ); }
-        elif( count() > 0 && size()> 0 ){ 
+        elif( count() > 0 && size()> 0 ){
               auto n_buffer=ptr_t<T>( size() );
               type::copy( begin(), end(), n_buffer.begin() );
         return n_buffer; } return nullptr;
@@ -262,7 +262,7 @@ public:
         if( _null_( address ) ){ return; }
         if( _offset > _limit  ){ limit=0, offset=0; return; }
         limit =min( address->length, _limit  );
-        offset=min( address->length, _offset ); 
+        offset=min( address->length, _offset );
     }
 
     /*─······································································─*/
@@ -297,7 +297,7 @@ public:
         else{ type::copy( value, value+N, begin() ); }
     }
 
-    void fill( T* value, ulong N ) const noexcept { 
+    void fill( T* value, ulong N ) const noexcept {
         if  ( empty() || value == nullptr ){ return; }
         if  ( type::is_trivially_copyable<T>::value )
             { memcpy( begin(), value, N*sizeof(T) ); }
@@ -316,7 +316,7 @@ public:
     void reset() noexcept { _del_( address ); }
 
     /*─······································································─*/
-    
+
     T*       begin() const noexcept { return null() ? nullptr : _begin_( address ); }
     T*         end() const noexcept { return null() ? nullptr : _end_  ( address ); }
 
@@ -354,7 +354,7 @@ public:
 
     /*─······································································─*/
 
-    T& operator[]( ulong i ) const noexcept { 
+    T& operator[]( ulong i ) const noexcept {
        return !empty() && i<size() ? data()[i] : data()[i%size()];
     }
 
@@ -415,19 +415,19 @@ protected:
 
 namespace nodepp::type {
 
-    template< class T, class V > 
-    T* cast( V* object ){ 
-        if( object==nullptr ){ return nullptr; } 
-        return (T*)( object ); 
+    template< class T, class V >
+    T* cast( V* object ){
+        if( object==nullptr ){ return nullptr; }
+        return (T*)( object );
     }
 
-    template< class T, class V > 
+    template< class T, class V >
     T* cast( ptr_t<V>& object ){
-        if ( object.null() ){ return nullptr; } 
-        return (T*)( object.get() ); 
+        if ( object.null() ){ return nullptr; }
+        return (T*)( object.get() );
     }
 
-    template< class T, class V > 
+    template< class T, class V >
     T cast( V object ){ return (T)( object ); }
 
 }
@@ -439,22 +439,22 @@ namespace nodepp::type {
     template< class T >
     ptr_t<T> bind( T* object ){
         if ( object==nullptr ){ return nullptr; }
-        return ptr_t<T>( new T( *object ) ); 
+        return ptr_t<T>( new T( *object ) );
     }
 
-    template<class T> 
+    template<class T>
     ptr_t<T> bind( ptr_t<T>& object ){ return object; }
 
-    template<class T, ulong N> 
-    ptr_t<T> bind( const T(&value)[N] ){ 
-    ptr_t<T> out(N); 
+    template<class T, ulong N>
+    ptr_t<T> bind( const T(&value)[N] ){
+    ptr_t<T> out(N);
         if  ( type::is_trivially_copyable<T>::value )
             { memcpy    ( out.begin(), (T*)value, N ); }
         else{ type::copy( value, value+N, out.begin() ); }
     return out; }
 
-    template<class T> 
-    ptr_t<T> bind( const T& object ) { 
+    template<class T>
+    ptr_t<T> bind( const T& object ) {
         if constexpr ( type::is_pod<T>::value ){
                  return ptr_t<T>( 0UL, object );
         } else { return ptr_t<T>( new T( object ) ); }

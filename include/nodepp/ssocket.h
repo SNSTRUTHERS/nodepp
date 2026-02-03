@@ -22,9 +22,9 @@
 
 namespace nodepp {
 
-class ssocket_t : public socket_t { 
+class ssocket_t : public socket_t {
 public: ptr_t<ssl_t> ssl;
-    
+
     /*─······································································─*/
 
     ssocket_t( ssl_t ssl, int df, ulong size=CHUNK_SIZE ) noexcept :
@@ -43,11 +43,11 @@ public: ptr_t<ssl_t> ssl;
 
     virtual int __write( char* bf, const ulong& sx ) const noexcept override {
         if ( process::millis() > get_send_timeout() || is_closed() )
-           { return -1; } if ( sx==0 ) { return  0; } 
+           { return -1; } if ( sx==0 ) { return  0; }
         if ( ssl.null() ) /*--------*/ { return -1; }
         obj->feof =ssl->_write( this, bf, sx ); return obj->feof;
     }
-    
+
 };}
 
 /*────────────────────────────────────────────────────────────────────────────*/

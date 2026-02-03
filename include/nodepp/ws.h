@@ -37,13 +37,13 @@ public:
     virtual int _write( char* bf, const ulong& sx ) const noexcept override {
         if( is_closed() ){ return -1; } if( sx==0 ){ return 0; }
         while( ws->write( this, bf, sx )==1 ){ return -2; }
-        return ws->write.data==0 ? -1 : ws->write.data;
+        return ws->write.data==0 ? -1 : int(ws->write.data);
     }
 
     virtual int _read ( char* bf, const ulong& sx ) const noexcept override {
         if( is_closed() ){ return -1; } if( sx==0 ){ return 0; }
         while( ws->read( this, bf, sx )==1 ){ return -2; }
-        return ws->read.data==0 ? -1 : ws->read.data;
+        return ws->read.data==0 ? -1 : int(ws->read.data);
     }
 
 };}
@@ -56,11 +56,11 @@ namespace nodepp::ws {
 
         auto hrv = type::cast<http_t>(raw);
         if( !generator::ws::server( hrv ) )
-          { skt.onConnect.skip(); return; }  
+          { skt.onConnect.skip(); return; }
 
         ws_t cli = type::cast<ws_t>(raw);
 
-        process::add([=](){ 
+        process::add([=](){
             cli.set_timeout(0); cli.resume();
             skt.onConnect.resume( );
             skt.onConnect.emit(cli);
@@ -94,7 +94,7 @@ namespace nodepp::ws {
             stream::pipe      (cli);
         return -1; });
 
-    }); skt.connect( url::hostname(uri), url::port(uri) ); return skt; }
+    }); skt.connect( url::hostname(uri), (int)url::port(uri) ); return skt; }
 
 }
 

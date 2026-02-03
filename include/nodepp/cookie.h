@@ -30,18 +30,18 @@ namespace cookie {
 
         reg.search_all( data ); auto mem = reg.get_memory();
         reg.clear_memory();
-        
+
         while( !mem.empty() ){ auto data = mem.splice( 0, 2 );
-           if( data.size()!=2 ){ break; } 
+           if( data.size()!=2 ){ break; }
                out[ data[0] ] = data[1];
         }  return out;
     }
-    
+
     /*─······································································─*/
-    
+
     inline string_t format( const cookie_t& data ){
-        if ( data.empty() ){ return nullptr; } queue_t<string_t> out; 
-        for( auto x:data.data() ){ out.push( x.first + "=" + x.second ); }   
+        if ( data.empty() ){ return nullptr; } queue_t<string_t> out;
+        for( auto x:data.data() ){ out.push( x.first + "=" + x.second ); }
         return string::format("%s",array_t<string_t>(out.data()).join("; ").c_str());
     }
 

@@ -72,35 +72,35 @@ public:
                      sk.IPPROTO = IPPROTO_TCP;
 
             if( sk.socket( dns::lookup(host), port )<0 ){
-                self->onError.emit("Error while creating TCP"); 
-                self->close(); sk.free(); return -1; 
+                self->onError.emit("Error while creating TCP");
+                self->close(); sk.free(); return -1;
             }   sk.set_sockopt( self->obj->agent );
 
             if( sk.bind()<0 ){
-                self->onError.emit("Error while binding TCP"); 
-                self->close(); sk.free(); return -1; 
+                self->onError.emit("Error while binding TCP");
+                self->close(); sk.free(); return -1;
             }
 
-            if( sk.listen()<0 ){ 
-                self->onError.emit("Error while listening TCP"); 
-                self->close(); sk.free(); return -1; 
-            }   cb( sk ); self->onOpen.emit( sk ); 
-            
+            if( sk.listen()<0 ){
+                self->onError.emit("Error while listening TCP");
+                self->close(); sk.free(); return -1;
+            }   cb( sk ); self->onOpen.emit( sk );
+
         process::poll( sk, POLL_STATE::READ | POLL_STATE::EDGE, coroutine::add( COROUTINE(){
         int c=-1; coBegin ; while( (*btch) --> 0 ){
 
             while((c=sk._accept()) == -2 ){ coSet(0); return 0; }
-            
-            if( c<0 ){ 
-                self->onError.emit("Error while accepting TCP"); 
+
+            if( c<0 ){
+                self->onError.emit("Error while accepting TCP");
             coEnd; }
-            
-            socket_t cli(c); 
+
+            socket_t cli(c);
 
             cli.set_sockopt( self->obj->agent );
             self->onSocket.emit(cli); self->obj->func(cli);
             if( cli.is_available() ){ self->onConnect.emit(cli); }
-            
+
         } *btch = MAX_BATCH; coGoto(0); coFinish })); return -1; }; process::add( clb );
 
     }
@@ -118,8 +118,8 @@ public:
                      sk.IPPROTO = IPPROTO_TCP;
 
             if( sk.socket( dns::lookup(host), port )<0 ){
-                self->onError.emit("Error while creating TCP"); 
-                self->close(); sk.free(); return -1; 
+                self->onError.emit("Error while creating TCP");
+                self->close(); sk.free(); return -1;
             }   sk.set_sockopt( self->obj->agent );
 
         process::add( coroutine::add( COROUTINE(){
@@ -132,10 +132,10 @@ public:
             sk.onDrain.once([=](){ self->close(); }); cb(sk);
             self->onSocket.emit(sk); self->obj->func(sk);
 
-            if( sk.is_available() ){ 
+            if( sk.is_available() ){
                 sk.onOpen      .emit(  );
-                self->onOpen   .emit(sk); 
-                self->onConnect.emit(sk); 
+                self->onOpen   .emit(sk);
+                self->onConnect.emit(sk);
             }
 
         coFinish })); return -1; }; process::add( clb );

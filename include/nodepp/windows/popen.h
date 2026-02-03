@@ -23,9 +23,9 @@
 namespace nodepp { class popen_t : public generator_t {
 protected:
 
-    void kill() const noexcept { 
-        ::CloseHandle( obj->pi.hProcess ); 
-        ::CloseHandle( obj->pi.hThread ); 
+    void kill() const noexcept {
+        ::CloseHandle( obj->pi.hProcess );
+        ::CloseHandle( obj->pi.hThread );
         obj->state |= STATE::FS_STATE_KILL;
     }
 
@@ -68,7 +68,7 @@ protected:
 
         SECURITY_ATTRIBUTES sa;
         /*---------------*/ sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-        /*---------------*/ sa.lpSecurityDescriptor = NULL; 
+        /*---------------*/ sa.lpSecurityDescriptor = NULL;
         /*---------------*/ sa.bInheritHandle /*-*/ = TRUE;
 
         HANDLE fda[2]; if(!CreatePipe(&fda[0],&fda[1],&sa,CHUNK_SIZE)){ throw except_t( "while piping stdin"  ); }
@@ -83,12 +83,12 @@ protected:
                     obj->si.hStdOutput= fdb[1];
                     obj->si.dwFlags  |= STARTF_USESTDHANDLES;
 
-        arg.unshift( path ); 
-        auto CMD = arg.join( string::space() ); 
+        arg.unshift( path );
+        auto CMD = arg.join( string::space() );
         auto ENV = env.join( string::null () );
 
         obj->fd = ::CreateProcess( NULL, CMD.get(), NULL, NULL, 1, 0, ENV.get(), NULL, &obj->si, &obj->pi );
-        WaitForSingleObject( obj->pi.hProcess, 0 ); 
+        WaitForSingleObject( obj->pi.hProcess, 0 );
         WaitForSingleObject( obj->pi.hThread , 0 );
 
         if( obj->fd != 0 ){
@@ -123,7 +123,7 @@ public:
     popen_t( const string_t& path, const initializer_t<string_t>& args )
     : obj( new NODE() ) { _init_( path, args, nullptr ); }
 
-    popen_t( const string_t& path ) 
+    popen_t( const string_t& path )
     : obj( new NODE() ) { auto cmd = regex::match_all( path, "[^ ]+" );
         if ( cmd.empty() ){ throw except_t("invalid command"); }
         _init_( cmd[0], cmd.slice(1), nullptr );
@@ -136,18 +136,18 @@ public:
     /*─······································································─*/
 
     void free() const noexcept {
-        
+
         if( is_state( STATE::FS_STATE_REUSE ) && obj.count()>1 ){ return; }
         if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
           { kill(); onDrain.emit(); } else { kill(); }
-        
+
     /*
         obj->std_error.close(); obj->std_output.close();
-        obj->std_input.close(); 
+        obj->std_input.close();
     */
-    
-        onResume.clear(); onError.clear(); 
+
+        onResume.clear(); onError.clear();
         onDerr  .clear(); onOpen .clear();
         onData  .clear(); onDout .clear(); onClose.emit();
 
@@ -157,20 +157,20 @@ public:
 
     inline int next() noexcept {
         if( is_closed() ){ free(); return -1; }
-    coBegin ; onOpen.emit(); 
-    
+    coBegin ; onOpen.emit();
+
         coYield(1); coDelay( 100 );  do {
         if((*_read1)(&std_output())==1) { coGoto(2); }
         if(  _read1->state <= 0 )       { coGoto(2); }
         onData.emit(_read1->data);
-        onDout.emit(_read1->data); coNext; } while(1);   
-        
+        onDout.emit(_read1->data); coNext; } while(1);
+
         coYield(2); coDelay( 100 );  do {
         if((*_read2)(&std_error())==1 ) { coGoto(1); }
         if(  _read2->state <= 0 )       { coGoto(1); }
         onData.emit(_read2->data);
         onDerr.emit(_read2->data); coNext; } while(1);
-        
+
     coGoto(1); coFinish
     }
 

@@ -24,9 +24,10 @@
 
 namespace nodepp::encoder::key {
 
-    inline string_t generate( const string_t& alph, int x=32 ){ ulong idx=0;
+    inline string_t generate( const string_t& alph, int x=32 ){
+        [[maybe_unused]] ulong idx=0;
         string_t data ( (ulong)x, '\0' ); for( auto &x: data ){
-        x = alph[rand()%(alph.size())]; ++idx; } return data;
+        x = alph[(ulong)rand()%(alph.size())]; ++idx; } return data;
     }
 
     inline string_t generate( int x=32 ) { return generate( NODEPP_BASE64, x ); }
@@ -39,11 +40,11 @@ namespace nodepp::encoder::hash {
 
     inline ulong get( const string_t& key, int tableSize ) {
         ulong hash = 5381; forEach( x, key ) {
-              hash = ((hash << 5) + hash) + x;
-        }     return hash % tableSize;
+              hash = ((hash << 5) + hash) + (ulong)x;
+        }     return hash % (ulong)tableSize;
     }
 
-    inline ulong get( int key, int tableSize ) { return key % tableSize; }
+    inline ulong get( int key, int tableSize ) { return (ulong)(key % tableSize); }
 
     inline ulong get( const string_t& key )    { return get( key, HASH_TABLE_SIZE ); }
 
@@ -142,17 +143,21 @@ namespace nodepp::encoder::bin {
 
 namespace nodepp::encoder::hex {
 
-    template< class T, class = typename type::enable_if<type::is_integral<T>::value,T>::type >
-    string_t get( T num ){ string_t out; do {
+    template< class T >
+    string_t get( T num )
+    requires(type::is_integral<T>::value)
+    { string_t out; do {
              out.unshift( NODEPP_BASE8[num&(T)(0xf)] ); num >>= 4;
         } while( num != 0 ); if( out.size()%2!=0 ){
              out.unshift( '0' );
         } return out;
     }
 
-    template< class T, class = typename type::enable_if<type::is_integral<T>::value,T>::type >
-    T set( string_t num ){ if ( num.empty() ){ return 0; }
-        T out = 0; for ( auto c: num ){    out  = out<<4;
+    template< class T >
+    T set( string_t num )
+    requires(type::is_integral<T>::value)
+    { if ( num.empty() ){ return 0; }
+        T out = 0; for ( auto c: num ){    out  = T(out<<4);
               if ( c >= '0' && c <= '9' ){ out |= c - '0'     ; }
             elif ( c >= 'a' && c <= 'f' ){ out |= c - 'a' + 10; }
             elif ( c >= 'A' && c <= 'F' ){ out |= c - 'A' + 10; }
@@ -162,11 +167,11 @@ namespace nodepp::encoder::hex {
 
     /*─······································································─*/
 
-    template< class T, class = typename type::enable_if<type::is_integral<T>::value,T>::type >
-    string_t atob( T num ) { return get( num ); }
+    template< class T >
+    string_t atob( T num ) requires(type::is_integral<T>::value) { return get( num ); }
 
-    template< class T, class = typename type::enable_if<type::is_integral<T>::value,T>::type >
-    T btoa( string_t num ) { return set<T>( num ); }
+    template< class T >
+    T btoa( string_t num ) requires(type::is_integral<T>::value) { return set<T>( num ); }
 
 }
 
@@ -242,7 +247,7 @@ namespace nodepp::encoder::base64 {
 
         queue_t<char> out; int pos1 = 0, pos2 = -6;
 
-        for ( uchar c: in ) {
+        for ( char c: in ) {
             pos1= ( pos1 << 8 ) + c; pos2 += 8;
             while ( pos2 >= 0 ) {
                 out.push(NODEPP_BASE64[(pos1>>pos2)&0x3F]);
@@ -261,9 +266,9 @@ namespace nodepp::encoder::base64 {
         queue_t<char> out; int pos1=0, pos2=-8;
         array_t<int> T( 256, -1 );
 
-        for ( int i=0; i<64; ++i ) T[NODEPP_BASE64[i]] = i;
-        for ( uchar c: in ) { if ( T[c]==-1 ) break;
-            pos1 = ( pos1 << 6 ) + T[c]; pos2 += 6;
+        for ( int i=0; i<64; ++i ) T[(ulong)NODEPP_BASE64[i]] = i;
+        for ( char c: in ) { if ( T[(ulong)c]==-1 ) break;
+            pos1 = ( pos1 << 6 ) + T[(ulong)c]; pos2 += 6;
             if (pos2 >= 0) {
                 out.push(char((pos1>>pos2)&0xFF));
                 pos2 -= 8;

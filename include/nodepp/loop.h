@@ -40,7 +40,7 @@ protected:
     /*─······································································─*/
 
     void* get_nearest_timeout( ulong time ) const noexcept {
-    
+
         auto x = obj->blocked.last(); while( x!=nullptr ){
         if( time>=x->data.first ){ return x->next; }
         x = x->prev; }
@@ -50,13 +50,13 @@ protected:
     /*─······································································─*/
 
     inline int blocked_queue_next() const noexcept {
-    
-        do{ auto x = obj->blocked.first(); 
+
+        do{ auto x = obj->blocked.first();
         if( x == nullptr ) /*----------*/ { return -1; }
         if( x->data.first>process::now() ){ return -1; }
 
         if( x->data.first < process::now() ){
-            obj->normal .push ( x->data.second ); 
+            obj->normal .push ( x->data.second );
             obj->blocked.erase( x );
         } else { break; }} while(1); return 1;
 
@@ -65,26 +65,26 @@ protected:
     /*─······································································─*/
 
     inline int normal_queue_next() const noexcept {
-    
+
         if( obj->normal.empty() ) /*-*/ { return -1; } do {
         if( obj->normal.get()==nullptr ){ return -1; }
 
         auto x = obj->normal.get(); auto y = obj->queue.as(x->data);
         auto o = obj->normal.get() == obj->normal.last() ? -1 : 1;
-        
-        if( y->data.second->flag & TASK_STATE::USED   ){ 
-            obj->normal.next(); 
+
+        if( y->data.second->flag & TASK_STATE::USED   ){
+            obj->normal.next();
         return 1; }
-        
-        if( y->data.second->flag & TASK_STATE::CLOSED ){ 
-            obj->queue .erase(y); 
+
+        if( y->data.second->flag & TASK_STATE::CLOSED ){
+            obj->queue .erase(y);
             obj->normal.erase(x);
-        return 1; } 
+        return 1; }
 
         y->data.second->flag |= TASK_STATE::USED;
 
         int c=0; ulong d=0; while( ([&](){
-            
+
             do{ c=y->data.first(); auto z=coroutine::getno();
             if( c==1 && z.flag&coroutine::STATE::CO_STATE_DELAY )
               { d=z.delay; goto GOT3; } switch(c) {
@@ -95,8 +95,8 @@ protected:
 
             GOT1:;
 
-                y->data.second->flag &=~ TASK_STATE::USED; 
-                obj->normal.next(); 
+                y->data.second->flag &=~ TASK_STATE::USED;
+                obj->normal.next();
                 return -1;
 
             GOT2:;
@@ -108,15 +108,15 @@ protected:
 
             do {
 
-                y->data.second->flag &=~ TASK_STATE::USED;  
+                y->data.second->flag &=~ TASK_STATE::USED;
                 ulong wake_time = d + process::now();
 
                 auto z = obj->blocked.as( get_nearest_timeout( wake_time ) );
                 obj->blocked.insert( z, NODE_TASK( { wake_time, y } ));
-                obj->normal .erase(x); 
+                obj->normal .erase(x);
 
                 return -1;
-                
+
             } while(0);
 
             GOT4:;
@@ -143,10 +143,10 @@ public:
 
     /*─······································································─*/
 
-    int get_delay() const noexcept { 
+    int get_delay() const noexcept {
         if(!obj->normal .empty() ){ return  0; }
         if( obj->blocked.empty() ){ return -1; }
-        
+
         ulong now  = process::now();
         ulong wake = obj->blocked.first()->data.first;
 
@@ -161,17 +161,17 @@ public:
 
     /*─······································································─*/
 
-    inline int next() const noexcept { 
+    inline int next() const noexcept {
         /*--*/ blocked_queue_next();
         return normal_queue_next ();
     }
 
     /*─······································································─*/
 
-    void clear() const noexcept { 
-        obj->queue  .clear(); 
-        obj->normal .clear(); 
-        obj->blocked.clear(); 
+    void clear() const noexcept {
+        obj->queue  .clear();
+        obj->normal .clear();
+        obj->blocked.clear();
     }
 
     /*─······································································─*/
@@ -181,7 +181,7 @@ public:
     ptr_t<task_t> tsk( 0UL, task_t() ); auto clb = type::bind( cb );
 
         obj->queue .push({[=](){ return (*clb)( args... );}, tsk });
-        obj->normal.push( obj->queue.last() ); 
+        obj->normal.push( obj->queue.last() );
 
         tsk->addr = obj->queue.last();
         tsk->flag = TASK_STATE::OPEN ;

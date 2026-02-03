@@ -42,12 +42,12 @@ protected:
     void set_time( time_t time, bool utc ) const noexcept {
         TIME* info  = !utc ? localtime( &time ) : gmtime( &time );
 
-        set_year  ( info->tm_year+1900 );
-        set_month ( info->tm_mon +1    );
-        set_second( info->tm_sec       );
-        set_minute( info->tm_min       );
-        set_day   ( info->tm_mday      );
-        set_hour  ( info->tm_hour      );
+        set_year  ( (uint)info->tm_year+1900 );
+        set_month ( (uint)info->tm_mon +1    );
+        set_second( (uint)info->tm_sec       );
+        set_minute( (uint)info->tm_min       );
+        set_day   ( (uint)info->tm_mday      );
+        set_hour  ( (uint)info->tm_hour      );
         set_utc   ( utc );
 
     }
@@ -55,12 +55,12 @@ protected:
     time_t get_time() const noexcept {
         TIME info; memset( &info, 0, sizeof(TIME) );
 
-        info.tm_sec  = obj->second;
-        info.tm_min  = obj->minute;
-        info.tm_mon  = obj->month;
-        info.tm_year = obj->year;
-        info.tm_hour = obj->hour;
-        info.tm_mday = obj->day;
+        info.tm_sec  = (int)obj->second;
+        info.tm_min  = (int)obj->minute;
+        info.tm_mon  = (int)obj->month;
+        info.tm_year = (int)obj->year;
+        info.tm_hour = (int)obj->hour;
+        info.tm_mday = (int)obj->day;
 
         return mktime( &info );
     }
@@ -69,7 +69,7 @@ public:
 
     template< class... V >
     date_t( const V&... args ) noexcept : obj( 0UL, NODE() ) { set_date( args... ); }
-    
+
     date_t() noexcept : obj( 0UL, NODE() ) { set_date( false ); }
 
     /*─······································································─*/
@@ -151,37 +151,37 @@ public:
         return (string_t)ctime( &time );
     }
 
-    uint get_year() const noexcept { time_t time = get_time();
+    [[nodiscard]] uint get_year() const noexcept { time_t time = get_time();
         TIME* info = !obj->utc ? localtime( &time ) : gmtime( &time );
-        return info->tm_year+1900;
+        return (uint)info->tm_year+1900;
     }
 
-    uint get_month() const noexcept { time_t time = get_time();
+    [[nodiscard]] uint get_month() const noexcept { time_t time = get_time();
         TIME* info = !obj->utc ? localtime( &time ) : gmtime( &time );
-        return info->tm_mon+1;
+        return (uint)info->tm_mon+1;
     }
 
-    uint get_hour() const noexcept { time_t time = get_time();
+    [[nodiscard]] uint get_hour() const noexcept { time_t time = get_time();
         TIME* info = !obj->utc ? localtime( &time ) : gmtime( &time );
-        return info->tm_hour;
+        return (uint)info->tm_hour;
     }
 
-    uint get_day() const noexcept { time_t time = get_time();
+    [[nodiscard]] uint get_day() const noexcept { time_t time = get_time();
         TIME* info = !obj->utc ? localtime( &time ) : gmtime( &time );
-        return info->tm_mday;
+        return (uint)info->tm_mday;
     }
 
-    uint get_minute() const noexcept { time_t time = get_time();
+    [[nodiscard]] uint get_minute() const noexcept { time_t time = get_time();
         TIME* info = !obj->utc ? localtime( &time ) : gmtime( &time );
-        return info->tm_min;
+        return (uint)info->tm_min;
     }
 
-    uint get_second() const noexcept { time_t time = get_time();
+    [[nodiscard]] uint get_second() const noexcept { time_t time = get_time();
         TIME* info = !obj->utc ? localtime( &time ) : gmtime( &time );
-        return info->tm_sec;
+        return (uint)info->tm_sec;
     }
 
-    uint get_stamp() const noexcept { return get_time(); }
+    [[nodiscard]] uint get_stamp() const noexcept { return (uint)get_time(); }
 
 };}
 
@@ -215,21 +215,21 @@ namespace nodepp {
 
 namespace nodepp::date {
 
-    inline uint now(){ return date_t().get_stamp(); }
+    [[nodiscard]] inline uint now(){ return date_t().get_stamp(); }
 
-    inline string_t fulltime(){ return date_t().get_fulltime(); }
+    [[nodiscard]] inline string_t fulltime(){ return date_t().get_fulltime(); }
 
-    inline uint day( const bool& utc ){ return date_t(utc).get_day(); }
+    [[nodiscard]] inline uint day( const bool& utc ){ return date_t(utc).get_day(); }
 
-    inline uint year( const bool& utc ){ return date_t(utc).get_year(); }
+    [[nodiscard]] inline uint year( const bool& utc ){ return date_t(utc).get_year(); }
 
-    inline uint hour( const bool& utc ){ return date_t(utc).get_hour(); }
+    [[nodiscard]] inline uint hour( const bool& utc ){ return date_t(utc).get_hour(); }
 
-    inline uint month( const bool& utc ){ return date_t(utc).get_month(); }
+    [[nodiscard]] inline uint month( const bool& utc ){ return date_t(utc).get_month(); }
 
-    inline uint minute( const bool& utc ){ return date_t(utc).get_minute(); }
+    [[nodiscard]] inline uint minute( const bool& utc ){ return date_t(utc).get_minute(); }
 
-    inline uint second( const bool& utc ){ return date_t(utc).get_second(); }
+    [[nodiscard]] inline uint second( const bool& utc ){ return date_t(utc).get_second(); }
 
 }
 

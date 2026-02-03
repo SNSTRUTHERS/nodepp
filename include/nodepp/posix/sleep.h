@@ -35,22 +35,22 @@
 namespace nodepp::process { using NODE_INTERVAL = struct timeval; }
 namespace nodepp::process {
 
-    inline NODE_INTERVAL& get_time_interval(){ 
-        thread_local static NODE_INTERVAL interval; 
+    inline NODE_INTERVAL& get_time_interval(){
+        thread_local static NODE_INTERVAL interval;
         gettimeofday( &interval, NULL );
         return interval;
     }
-    
+
     inline ulong micros(){ NODE_INTERVAL time = get_time_interval();
-        return time.tv_sec * 1000000 + time.tv_usec; 
+        return (ulong)(time.tv_sec * 1000000 + time.tv_usec);
     }
-    
+
     inline ulong seconds(){ NODE_INTERVAL time = get_time_interval();
-        return time.tv_sec + time.tv_usec / 1000000; 
+        return (ulong)(time.tv_sec + time.tv_usec / 1000000);
     }
-    
+
     inline ulong millis(){ NODE_INTERVAL time = get_time_interval();
-        return time.tv_sec * 1000 + time.tv_usec / 1000; 
+        return (ulong)(time.tv_sec * 1000 + time.tv_usec / 1000);
     }
 
 }
@@ -60,13 +60,13 @@ namespace nodepp::process {
 namespace nodepp::process {
 
     inline ulong& get_timeout( bool reset=false ) {
-    thread_local static ulong stamp=0; 
+    thread_local static ulong stamp=0;
         if( reset ){ stamp = 60000; }
     return stamp; }
 
     inline void clear_timeout() { get_timeout(true); }
 
-    inline ulong set_timeout( int time=0 ) { 
+    inline ulong set_timeout( int time=0 ) {
         if( time < 0 ){ /*--------------*/ return 1; }
         auto stamp=&get_timeout(); ulong out=*stamp;
         if( *stamp>(ulong)time ){ *stamp=(ulong)time; }
@@ -78,7 +78,7 @@ namespace nodepp::process {
 
 namespace nodepp::process {
 
-    inline void delay( ulong time ){ ::usleep(time*1000); }
+    inline void delay( ulong time ){ ::usleep((uint)time*1000); }
 
     inline void yield(){ delay(TIMEOUT); }
 

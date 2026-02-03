@@ -43,13 +43,13 @@ namespace nodepp::limit {
 namespace nodepp::limit {
 
     inline uint get_hard_fileno() { struct rlimit limit;
-        if( getrlimit( RLIMIT_NOFILE, &limit )==0 ) 
-          { return limit.rlim_max; } return 1024;
+        if( getrlimit( RLIMIT_NOFILE, &limit )==0 )
+          { return (uint)limit.rlim_max; } return 1024;
     }
 
     inline uint get_soft_fileno() { struct rlimit limit;
-        if( getrlimit( RLIMIT_NOFILE, &limit )==0 ) 
-          { return limit.rlim_cur; } return 1024;
+        if( getrlimit( RLIMIT_NOFILE, &limit )==0 )
+          { return (uint)limit.rlim_cur; } return 1024;
     }
 
     inline int set_hard_fileno( uint value ) {
@@ -66,20 +66,20 @@ namespace nodepp::limit {
         return setrlimit( RLIMIT_NOFILE, &limit );
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
+namespace nodepp::limit {
 
     inline uint get_hard_thread_pool() { struct rlimit limit;
-        if( getrlimit( RLIMIT_NPROC, &limit )==0 ) 
-          { return limit.rlim_max; } return 1024;
+        if( getrlimit( RLIMIT_NPROC, &limit )==0 )
+          { return (uint)limit.rlim_max; } return 1024;
     }
 
     inline uint get_soft_thread_pool() { struct rlimit limit;
-        if( getrlimit( RLIMIT_NPROC, &limit )==0 ) 
-          { return limit.rlim_cur; } return 1024;
+        if( getrlimit( RLIMIT_NPROC, &limit )==0 )
+          { return (uint)limit.rlim_cur; } return 1024;
     }
 
     inline int set_hard_soft_thread_pool( uint value ) {
@@ -96,18 +96,18 @@ namespace nodepp { namespace limit {
         return setrlimit( RLIMIT_NPROC, &limit );
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace limit {
-    
+namespace nodepp::limit {
+
     struct PRIORITY{ enum FLAG {
          IDLE_PRIORITY    , LOW_PRIORITY     ,
          NORMAL_PRIORITY  , HIGH_PRIORITY    ,
          HIGHEST_PRIORITY , REALTIME_PRIORITY
     }; };
-    
+
     inline int set_process_priority( int priority ){ int n; switch( priority ) {
         case   PRIORITY::IDLE_PRIORITY:     n =  19; break;
         case   PRIORITY::LOW_PRIORITY:      n =  5 ; break;

@@ -90,12 +90,14 @@ public:
 
     template< class U >
     object_t( const U& any ) : obj( new NODE() ) {
-        if( type::is_same<U,ARRAY>::value )
-          { obj->type = 21; goto BACK; }
-      elif( type::is_same<U,QUEUE>::value )
-          { obj->type = 20; goto BACK; }
-        obj->type = type::obj_type_id<U>::value;
-        BACK:; obj->mem = any;
+        if constexpr ( type::is_same<U,ARRAY>::value ) {
+            obj->type = 21;
+        } elif constexpr ( type::is_same<U,QUEUE>::value ) {
+            obj->type = 20;
+        } else {
+            obj->type = type::obj_type_id<U>::value;
+        }
+        obj->mem = any;
     }
 
     object_t() : obj( new NODE() ){}
@@ -103,22 +105,22 @@ public:
     /*─······································································─*/
 
     template< class U > bool is() const {
-        if  ( get_type_id()==21 && type::is_same<U,ARRAY>::value ){ return true; }
-        elif( get_type_id()==20 && type::is_same<U,QUEUE>::value ){ return true; }
-        elif( get_type_id()     == type::obj_type_id<U>  ::value ){ return true; } 
+        if  ( type::is_same<U,ARRAY>::value && get_type_id()==21 ){ return true; }
+        elif( type::is_same<U,QUEUE>::value && get_type_id()==20 ){ return true; }
+        elif( get_type_id()     == type::obj_type_id<U>  ::value ){ return true; }
     return false; }
 
     template< class U >
     explicit operator U() const { return /*-------------*/ obj->mem.as<U>    (); }
-    bool has_value()      const { return obj->type<0?false:obj->mem.has_value(); }
-    uint type_size()      const { return obj->type<0?false:obj->mem.type_size(); }
+    bool has_value() const { return obj->type<0?false:obj->mem.has_value(); }
+    uint type_size() const { return obj->type<0?false:(uint)obj->mem.type_size(); }
 
     template< class U > U as() const { return obj->mem.as<U>(); }
 
     /*─······································································─*/
 
     object_t& operator[]( const string_t& name ) const {
-        if( obj->type != 20 ){ 
+        if( obj->type != 20 ){
             QUEUE mem; mem[name] = object_t();
             obj->mem = mem; obj->type=20; /**/
         }   return obj->mem.as<QUEUE>()[name];

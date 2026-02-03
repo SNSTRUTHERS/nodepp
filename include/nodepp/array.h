@@ -40,7 +40,7 @@ protected:
         ulong b = clamp( first() + x, 0UL, a      );
         ulong c = a - b + 1;
 
-        ptr_t<ulong> arr ( 3UL, 0UL ); 
+        ptr_t<ulong> arr ( 3UL, 0UL );
         arr[0] = b; arr[1] = a; arr[2] = c; return arr;
     }
 
@@ -49,18 +49,18 @@ protected:
         if( empty() || y == 0 ){ return nullptr; }
 
         if( x < 0 ){ x = last() + x; } if( (ulong)x > last() ){ return nullptr; }
-            y += x - 1;
+            y += (ulong)(x - 1);
         if( y > last() ){ y= last(); } if( y < (ulong)x ){ return nullptr; }
 
         ulong a = clamp( first() + y, 0UL, last() );
         ulong b = clamp( first() + x, 0UL, a      );
         ulong c = a - b + 1;
 
-        ptr_t<ulong> arr ( 3UL, 0UL ); 
+        ptr_t<ulong> arr ( 3UL, 0UL );
         arr[0] = b; arr[1] = a; arr[2] = c; return arr;
     }
 
-public: 
+public:
 
     array_t( const ptr_t<T>& argc ) noexcept { buffer = argc; }
 
@@ -125,9 +125,12 @@ public:
     }
 
     int count( function_t<bool,T> func ) const noexcept {
-        int out=0; auto addr = begin(); while( addr != end() ){
+        [[maybe_unused]] int out=0;
+        auto addr = begin();
+        while( addr != end() ){
             if( func( *addr ) ){ ++out; }
-        ++addr; } return -1;
+            ++addr;
+        } return -1;
     }
 
     /*─······································································─*/
@@ -175,7 +178,7 @@ public:
          elif( *addr == data[x] ){ idx[1]=pos; ++x; }
          else{ idx[0]=pos; idx[1]=pos; x=0; }
         ++addr; }
-        
+
         return idx[0]!=idx[1] ? idx : nullptr;
     }
 
@@ -205,7 +208,7 @@ public:
     }
 
     array_t remove( function_t<bool,T> func ) noexcept {
-        ulong n=size(); while( n-->0 ){ 
+        ulong n=size(); while( n-->0 ){
             if( func((*this)[n]) ){ erase(n); }
         } return (*this);
     }
@@ -253,7 +256,8 @@ public:
     /*─······································································─*/
 
     void insert( ulong index, const T& value ) noexcept {
-	    index = clamp( index, 0UL, size() ); if( empty() ){ buffer = ptr_t<T> (1); buffer[0] = value; }
+	    index = clamp( index, 0UL, size() );
+        if( empty() ){ buffer = ptr_t<T> (1); buffer[0] = value; }
         else { ulong n=size() + 1; auto n_buffer = ptr_t<T>( n );
             type::copy( begin()+index, end()        , n_buffer.begin()+index+1 );
             type::copy( begin()      , begin()+index, n_buffer.begin()         );
@@ -262,7 +266,8 @@ public:
     }
 
     void insert( ulong index, ulong N, const T& value ) noexcept {
-	    index = clamp( index, 0UL, size() ); if( empty() ){ buffer = ptr_t<T> ( N, value ); }
+	    index = clamp( index, 0UL, size() );
+        if( empty() ){ buffer = ptr_t<T> ( N, value ); }
         else{ ulong n=size() + N; auto n_buffer = ptr_t<T>( n );
             type::copy( begin()+index         , end()                   , n_buffer.begin()+index+N );
             type::fill( n_buffer.begin()+index, n_buffer.begin()+index+N, value                    );
@@ -284,7 +289,8 @@ public:
     }
 
     void insert( ulong index, ulong N, T* value ) noexcept {
-	    index = clamp( index, 0UL, size() ); if( empty() ){ buffer = ptr_t<T> ( value, N ); }
+	    index = clamp( index, 0UL, size() );
+        if( empty() ){ buffer = ptr_t<T> ( value, N ); }
         else { ulong n=size() + N; auto n_buffer = ptr_t<T>( n );
             type::copy( begin()+index, end()        , n_buffer.begin()+index+N );
             type::copy( value        , value+N      , n_buffer.begin()+index   );
@@ -295,7 +301,8 @@ public:
 
     template< class V, ulong N >
     void insert( ulong index, const V (&value)[N] ) noexcept {
-	    index = clamp( index, 0UL, size() ); if( empty() ){ buffer = ptr_t<T> ( N ); 
+	    index = clamp( index, 0UL, size() );
+        if( empty() ){ buffer = ptr_t<T> ( N );
             type::copy( value, value + N, buffer.begin() );
         } else { ulong n=size() + N; auto n_buffer = ptr_t<T>( n );
             type::copy( begin()+index, end()        , n_buffer.begin()+index+N );
@@ -308,7 +315,8 @@ public:
     /*─······································································─*/
 
     void erase( ulong index ) noexcept {
-	    auto r = get_slice_range( index, size() ); if ( r.null() ){ return; }
+	    auto r = get_slice_range( index, size() );
+        if ( r.null() ){ return; }
         else { auto n_buffer = ptr_t<T>( size() - 1 );
             type::copy( begin()+r[0]+1, end()       , n_buffer.begin()+r[0] );
             type::copy( begin()       , begin()+r[0], n_buffer.begin()      );
@@ -317,7 +325,8 @@ public:
     }
 
     void erase( ulong start, ulong stop ) noexcept {
-	    auto r = get_slice_range( start, stop ); if ( r.null() ){ return; }
+	    auto r = get_slice_range( start, stop );
+        if ( r.null() ){ return; }
         else { auto n_buffer = ptr_t<T>( size()-r[2] );
             type::copy( begin()+r[1]+1, end()       , n_buffer.begin()+r[0] );
             type::copy( begin()       , begin()+r[0], n_buffer.begin()      );
@@ -334,17 +343,17 @@ public:
         auto addr = begin(); while( addr != end() ){
              borrow.push( string::to_string( *addr ) );
              size += borrow.last()->data.size();
-        if( addr+1 != end() ){ size += c.size(); } ++addr; } 
-        
-        string_t out( size, '\0' ); auto n=borrow.first(); 
-        
+        if( addr+1 != end() ){ size += c.size(); } ++addr; }
+
+        string_t out( size, '\0' ); auto n=borrow.first();
+
         while( n!=nullptr ){
-            memcpy( out.begin()+off, n->data.get(), n->data.size() ); 
+            memcpy( out.begin()+off, n->data.get(), n->data.size() );
             off+= n->data.size();
-        if( off < out.size() ){ 
-            memcpy( out.begin()+off, c.data(), c.size() ); 
+        if( off < out.size() ){
+            memcpy( out.begin()+off, c.data(), c.size() );
         }   off+= c.size(); n=n->next; }
-        
+
         return out;
     }
 
@@ -352,13 +361,13 @@ public:
 
     array_t slice_view( long start, long stop ) const noexcept {
 	    auto r = get_slice_range( start, stop );
-        if ( r.null() ){ return nullptr; } 
+        if ( r.null() ){ return nullptr; }
         return ptr_t<T>( buffer, r[0], r[0]+r[2] );
     }
 
     array_t slice_view( long start ) const noexcept {
 	    auto r = get_slice_range( start, size() );
-        if ( r.null() ){ return nullptr; } 
+        if ( r.null() ){ return nullptr; }
         return ptr_t<T>( buffer, r[0], r[0]+r[2] );
     }
 
@@ -367,18 +376,18 @@ public:
     array_t slice( long start ) const noexcept {
 
 	    auto r = get_slice_range( start, size() );
-        if ( r.null() ){ return nullptr; } 
+        if ( r.null() ){ return nullptr; }
 
         auto n_buffer = ptr_t<T>( r[2] );
         type::copy( begin()+r[0], begin()+r[0]+r[2], n_buffer.begin() );
-        
+
         return n_buffer;
     }
 
     array_t slice( long start, long stop ) const noexcept {
 
 	    auto r = get_slice_range( start, stop );
-        if ( r.null() ){ return nullptr; } 
+        if ( r.null() ){ return nullptr; }
 
         auto n_buffer = ptr_t<T>( r[2] );
         type::copy( begin()+r[0], begin()+r[0]+r[2], n_buffer.begin() );
@@ -391,11 +400,11 @@ public:
     array_t splice( long start, ulong stop ) noexcept {
 
 	    auto r = get_splice_range( start, stop );
-        if ( r.null() ){ return nullptr; } 
+        if ( r.null() ){ return nullptr; }
 
         auto n_buffer = ptr_t<T>( r[2] );
         type::copy( begin()+r[0], begin()+r[0]+r[2], n_buffer.begin() );
-        
+
         erase( r[0], r[0] + r[2] ); return n_buffer;
     }
 
@@ -442,10 +451,10 @@ namespace nodepp::string {
     template< class T >
     array_t<string_t> split_view( string_t _str, const T& pattern ){
         queue_t<string_t> out; ulong offset=0; ptr_t<int> idx;
-        
+
         while( (idx=_str.find( pattern, offset )) != nullptr ){
-            out.push( _str.slice_view( offset, idx[0] ) ); offset=idx[1];
-        }   out.push( _str.slice_view( offset ) );
+            out.push( _str.slice_view( (long)offset, idx[0] ) ); offset=(ulong)idx[1];
+        }   out.push( _str.slice_view( (long)offset ) );
 
         return out.data();
     }
@@ -453,10 +462,10 @@ namespace nodepp::string {
     template< class T >
     array_t<string_t> split( string_t _str, const T& pattern ){
         queue_t<string_t> out; ulong offset=0; ptr_t<int> idx;
-        
+
         while( (idx=_str.find( pattern, offset )) != nullptr ){
-            out.push( _str.slice( offset, idx[0] ) ); offset=idx[1];
-        }   out.push( _str.slice( offset ) );
+            out.push( _str.slice( (long)offset, idx[0] ) ); offset=(ulong)idx[1];
+        }   out.push( _str.slice( (long)offset ) );
 
         return out.data();
     }

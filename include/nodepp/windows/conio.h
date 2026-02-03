@@ -39,7 +39,7 @@ namespace nodepp::conio { WORD attr = 0, dflt = 7;
         auto fd = GetStdHandle( STD_ERROR_HANDLE );
         WriteFile( fd, args.get(), args.size(), &len, NULL ); return len;
     }
-    
+
     inline int pout( const string_t& args ){ DWORD len=0;
         auto fd = GetStdHandle( STD_OUTPUT_HANDLE );
         WriteFile( fd, args.get(), args.size(), &len, NULL ); return len;
@@ -49,7 +49,7 @@ namespace nodepp::conio { WORD attr = 0, dflt = 7;
     int scan( const V& argc, const T&... args ){ DWORD len=0;
         auto bff = string::buffer( UNBFF_SIZE );
         auto fd  = GetStdHandle( STD_INPUT_HANDLE );
-        ReadFile( fd, bff.get(), bff.size(), &len, NULL ); 
+        ReadFile( fd, bff.get(), bff.size(), &len, NULL );
         auto data= string_t( &bff, len );
         return string::parse( data.get(), argc, args... );
     }
@@ -62,8 +62,8 @@ namespace nodepp::conio { WORD attr = 0, dflt = 7;
 
         auto data = string::join( " ", args... );
         pout( data );
-        
-        SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ), dflt ); 
+
+        SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ), dflt );
         attr = 0; return data.size();
     }
 
@@ -73,11 +73,11 @@ namespace nodepp::conio { WORD attr = 0, dflt = 7;
 
         auto data = string::join( " ", args... );
         perr( data );
-        
-        SetConsoleTextAttribute( GetStdHandle( STD_ERROR_HANDLE ), dflt ); 
+
+        SetConsoleTextAttribute( GetStdHandle( STD_ERROR_HANDLE ), dflt );
         attr = 0; return data.size();
     }
-    
+
     /*─······································································─*/
 
     inline int set_position( int x, int y ){ COORD coord; coord.X = x; coord.Y = y;
@@ -91,7 +91,7 @@ namespace nodepp::conio { WORD attr = 0, dflt = 7;
     inline int gotoxy( int x, int y ){ return set_position( x, y ); }
     inline int clear(){ return system("cls"); }
     inline int reset(){ attr = 0; return 1; }
-    
+
     /*─······································································─*/
 
     inline int background( int state ){
@@ -121,7 +121,7 @@ namespace nodepp::conio { WORD attr = 0, dflt = 7;
             case color::blue:    attr |= FOREGROUND_BLUE;  return 1; break;
         }   return -1;
     }
-    
+
     /*─······································································─*/
 
     inline int error( string_t msg ){ foreground( color::red    | color::bold ); return log( msg ); }

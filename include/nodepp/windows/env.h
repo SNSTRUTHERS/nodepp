@@ -23,7 +23,7 @@
 namespace nodepp::process::env {
 
     inline int    set( const string_t& name, const string_t& value ){ return SetEnvironmentVariableA( name.c_str(), value.c_str() ); }
-    
+
     inline int remove( const string_t& name ){ return SetEnvironmentVariableA( name.c_str(), nullptr ); }
 
     inline string_t get( const string_t& name ){ ptr_t<char> buffer ( UNBFF_SIZE );

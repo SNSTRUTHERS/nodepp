@@ -54,7 +54,7 @@ public:
         if( !has_value() ) /*----*/ { throw except_t("any_t is null"); } /*---------*/
         if( type_size()!=sizeof(T) ){ throw except_t("any_t incompatible sizetype"); }
 
-        alignas(T) char any [ sizeof(T) / sizeof(char) ]; 
+        alignas(T) char any [ sizeof(T) / sizeof(char) ];
         any_ptr->get((void*)&any); return *(T*)(any);
 
     }

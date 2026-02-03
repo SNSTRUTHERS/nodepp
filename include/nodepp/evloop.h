@@ -54,7 +54,7 @@ namespace nodepp::process { inline atomic_t<bool> _EXIT_ = false;
 
     template< class... T >
     ptr_t<task_t> add ( const T&... args ){ return NODEPP_EV_LOOP().loop_add( args... ); }
-    
+
     /*─······································································─*/
 
     inline void clear( ptr_t<task_t> address ){ NODEPP_EV_LOOP().off( address ); }
@@ -72,9 +72,9 @@ namespace nodepp::process { inline atomic_t<bool> _EXIT_ = false;
 
     inline int next(){ return NODEPP_EV_LOOP().next(); }
 
-    inline void exit( int err=0 ){ 
+    inline void exit( int err=0 ){
         if( should_close() ){ goto DONE; }
-        _EXIT_.set(true); clear(); DONE:; ::exit(err); 
+        _EXIT_.set(true); clear(); DONE:; ::exit(err);
     }
 
 }

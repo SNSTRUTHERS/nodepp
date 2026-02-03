@@ -30,12 +30,12 @@
         template< class... T > string_t await( const T&... args ){
             string_t out; auto pid = type::bind( popen_t( args... ) );
             pid->onData([&]( string_t chunk ){ out += chunk; });
-            worker::await([&](){ return pid->next(); }); 
+            worker::await([&](){ return pid->next(); });
         return out; }
 
         template< class... T > popen_t async( const T&... args ){
             auto pid = type::bind( popen_t( args... ) );
-            worker::add([=](){ return pid->next(); }); 
+            worker::add([=](){ return pid->next(); });
         return *pid; }
 
     }
@@ -51,12 +51,12 @@
         template< class... T > string_t await( const T&... args ){
             string_t out; auto pid = type::bind( popen_t( args... ) );
             pid->onData([&]( string_t chunk ){ out += chunk; });
-            process::await([&](){ return pid->next(); }); 
+            process::await([&](){ return pid->next(); });
         return out; }
 
         template< class... T > popen_t async( const T&... args ){
             auto pid = type::bind( popen_t( args... ) );
-            process::add([=](){ return pid->next(); }); 
+            process::add([=](){ return pid->next(); });
         return *pid; }
 
     }

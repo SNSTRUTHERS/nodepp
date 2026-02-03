@@ -27,7 +27,7 @@ protected:
     using  DONE = function_t<bool,A...>;
     struct NODE {
         queue_t<DONE> que; void *addr =nullptr;
-        /*--------------*/ int   state=0x00; 
+        /*--------------*/ int   state=0x00;
     };  ptr_t  <NODE> obj;
 
     enum STATE {
@@ -54,7 +54,7 @@ public:
         obj->que.push([=]( A... args ){
             if( task.null() || clb.null() ) /*------------*/ { return false; }
             if( task->flag & TASK_STATE::CLOSED ){ return false; }
-                task->flag = TASK_STATE::CLOSED; (*clb)(args...); 
+                task->flag = TASK_STATE::CLOSED; (*clb)(args...);
         return false; });
 
         task->flag = TASK_STATE::OPEN;
@@ -70,7 +70,7 @@ public:
             if( task.null() || clb.null() ) /*------------*/ { return false; }
             if( task->flag & TASK_STATE::CLOSED ){ return false; }
             if( task->flag & TASK_STATE::USED   ){ return true ; }
-                task->flag|= TASK_STATE::USED;   (*clb)(args...); 
+                task->flag|= TASK_STATE::USED;   (*clb)(args...);
                 task->flag&=~TASK_STATE::USED;
         return true; });
 
@@ -87,7 +87,7 @@ public:
         if( address->flag & TASK_STATE::CLOSED ){ return; }
         if( address->sign != &obj ) /*-------*/ { return; }
             address->flag = TASK_STATE::CLOSED;
-        auto node = obj->que.as( address->addr ); 
+        auto node = obj->que.as( address->addr );
         if( obj->addr == address->addr ){ obj->addr = node->next; }
         if( node != nullptr ) /*-----*/ { obj->que.erase( node ); }
     }
@@ -108,7 +108,7 @@ public:
 
         while( x!=nullptr ){ obj->addr=x->next;
         if   ( !x->data.emit(args...) )
-             { obj->que.erase(x); } 
+             { obj->que.erase(x); }
         x = obj->que.as( obj->addr ); }
 
         obj->state &=~ STATE::EV_STATE_USED;
@@ -116,7 +116,7 @@ public:
 
     /*─······································································─*/
 
-    bool is_paused() const noexcept { 
+    bool is_paused() const noexcept {
         return obj->state & ( STATE::EV_STATE_SKIP |
         /*-----------------*/ STATE::EV_STATE_STOP );
     }
@@ -125,12 +125,12 @@ public:
         return obj->state & STATE::EV_STATE_USED ;
     }
 
-    void resume() const noexcept { 
-        obj->state &=~ ( STATE::EV_STATE_STOP | 
+    void resume() const noexcept {
+        obj->state &=~ ( STATE::EV_STATE_STOP |
         /*------------*/ STATE::EV_STATE_SKIP );
     }
 
-    void stop() const noexcept { 
+    void stop() const noexcept {
         obj->state |= STATE::EV_STATE_STOP;
     }
 

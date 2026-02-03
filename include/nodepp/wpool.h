@@ -32,17 +32,17 @@ protected:
     struct DONE { probe_t t; ulong d; int c; };
 
     struct NODE {
-           probe_t pool;  mutex_t mut; 
+           probe_t pool;  mutex_t mut;
            queue_t<NODE_TASK> blocked;
            queue_t<void*>     normal;
            queue_t<NODE_PAIR> queue;
-           ulong pool_size; 
+           ulong pool_size;
     };     ptr_t<NODE> obj;
 
     /*─······································································─*/
 
     void* get_nearest_timeout( ulong time ) const noexcept {
-    
+
         auto x = obj->blocked.last(); while( x!=nullptr ){
         if( time>=x->data.first ){ return x->next; }
         x = x->prev; }
@@ -52,13 +52,13 @@ protected:
     /*─······································································─*/
 
     inline int blocked_queue_next() const noexcept {
-    
+
         auto x = obj->blocked.first(); do {
         if( x == nullptr ) /*----------*/ { return -1; }
         if( x->data.first>process::now() ){ return -1; }
 
         if( x->data.first < process::now() ){
-            obj->normal .push ( x->data.second ); 
+            obj->normal .push ( x->data.second );
             obj->blocked.erase( x );
         }} while(0); return 1;
 
@@ -67,7 +67,7 @@ protected:
     /*─······································································─*/
 
     inline int normal_queue_next() const noexcept {
-    
+
         if( obj->normal.empty() ) /*-------*/ { return -1; } do {
         if( obj->normal.get()==nullptr ) /**/ { return -1; }
         if( obj->pool  .get()>obj->pool_size ){ return -1; }
@@ -77,13 +77,13 @@ protected:
         auto self = type::bind(this); obj->normal.next();
 
         if( y->data.second->flag & TASK_STATE::USED   ){ return 1; }
-        if( y->data.second->flag & TASK_STATE::CLOSED ){ 
-            obj->queue .erase(y); 
+        if( y->data.second->flag & TASK_STATE::CLOSED ){
+            obj->queue .erase(y);
             obj->normal.erase(x);
-        return 1; } 
+        return 1; }
 
         y->data.second->flag |= TASK_STATE::USED;
-        
+
         worker::add([=](){
         thread_local static DONE i = { self->obj->pool, 0, 0 };
         coStart; coYield(1);
@@ -124,14 +124,14 @@ protected:
                 self->obj->normal .erase(x);
 
             }); coEnd;
-            
+
         coStop }); return o; } while(0); return -1;
 
     }
 
 public:
 
-    wpool_t( ulong pool_size= MAX_POOL_SIZE ) noexcept : obj( new NODE() ) 
+    wpool_t( ulong pool_size= MAX_POOL_SIZE ) noexcept : obj( new NODE() )
            { obj->pool_size = pool_size; }
 
     /*─······································································─*/
@@ -147,11 +147,11 @@ public:
 
     /*─······································································─*/
 
-    int get_delay() const noexcept { 
-        
+    int get_delay() const noexcept {
+
         if(!obj->normal .empty() ){ return  0; }
         if( obj->blocked.empty() ){ return -1; }
-        
+
         ulong wake = obj->blocked.first()->data.first;
         ulong now  = process::now();
 
@@ -159,10 +159,10 @@ public:
 
     /*─······································································─*/
 
-    void clear() const noexcept { 
-        obj->queue  .clear(); 
-        obj->normal .clear(); 
-        obj->blocked.clear(); 
+    void clear() const noexcept {
+        obj->queue  .clear();
+        obj->normal .clear();
+        obj->blocked.clear();
     }
 
     /*─······································································─*/
@@ -195,7 +195,7 @@ public:
     ptr_t<task_t> tsk( 0UL, task_t() ); auto clb = type::bind( cb );
 
         obj->queue .push({[=](){ return (*clb)( args... );}, tsk });
-        obj->normal.push( obj->queue.last() ); 
+        obj->normal.push( obj->queue.last() );
 
         tsk->addr = obj->queue.last();
         tsk->flag = TASK_STATE::OPEN ;

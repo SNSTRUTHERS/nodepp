@@ -15,7 +15,7 @@
 #include "any.h"
 
 namespace nodepp {
-template <typename T, typename E> struct expected_t { 
+template <typename T, typename E> struct expected_t {
 protected:
 
     bool has; any_t data;

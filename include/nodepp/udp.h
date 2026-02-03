@@ -69,25 +69,25 @@ public: udp_t() noexcept : obj( new NODE() ) {}
                      sk.IPPROTO = IPPROTO_UDP;
 
             if( sk.socket( dns::lookup(host), port )<0 ){
-                self->onError.emit("Error while creating UDP"); 
-                self->close(); sk.free(); return; 
+                self->onError.emit("Error while creating UDP");
+                self->close(); sk.free(); return;
             }   sk.set_sockopt( self->obj->agent );
 
         process::add( coroutine::add( COROUTINE(){
         int c=0; coBegin
 
-            coWait( (c=sk._bind())==-2 ); if( c<0 ){ 
-                self->onError.emit("Error while binding UDP"); 
-                self->close(); sk.free(); 
+            coWait( (c=sk._bind())==-2 ); if( c<0 ){
+                self->onError.emit("Error while binding UDP");
+                self->close(); sk.free();
             coEnd; }
 
             sk.onDrain.once([=](){ self->close(); }); cb(sk);
             self->onSocket.emit(sk); self->obj->func(sk);
-                
-            if( sk.is_available() ){ 
+
+            if( sk.is_available() ){
                 sk.onOpen      .emit(  );
-                self->onOpen   .emit(sk); 
-                self->onConnect.emit(sk); 
+                self->onOpen   .emit(sk);
+                self->onConnect.emit(sk);
             }
 
         coFinish })); }; clb();
@@ -107,8 +107,8 @@ public: udp_t() noexcept : obj( new NODE() ) {}
                      sk.IPPROTO = IPPROTO_UDP;
 
             if( sk.socket( dns::lookup(host), port )<0 ){
-                self->onError.emit("Error while creating UDP"); 
-                self->close(); sk.free(); return; 
+                self->onError.emit("Error while creating UDP");
+                self->close(); sk.free(); return;
             }   sk.set_sockopt( self->obj->agent );
 
         process::add( coroutine::add( COROUTINE(){
@@ -117,10 +117,10 @@ public: udp_t() noexcept : obj( new NODE() ) {}
             sk.onDrain.once([=](){ self->close(); }); cb(sk);
             self->onSocket.emit(sk); self->obj->func(sk);
 
-            if( sk.is_available() ){ 
+            if( sk.is_available() ){
                 sk.onOpen      .emit(  );
-                self->onOpen   .emit(sk); 
-                self->onConnect.emit(sk); 
+                self->onOpen   .emit(sk);
+                self->onConnect.emit(sk);
             }
 
         coFinish })); }; clb();

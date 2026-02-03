@@ -98,7 +98,7 @@ namespace nodepp::fs {
 
     inline bool exists_file( const string_t& path ){
          if ( path.empty() )     { return 0; }
-        try { file_t( path, "r" ); return 1;
+        try { static_cast<void>(file_t( path, "r" )); return 1;
             } catch(...){} return 0;
     }
 
@@ -106,7 +106,7 @@ namespace nodepp::fs {
 
     inline int create_file( const string_t& path ){
         if ( path.empty() )      { return -1; }
-        try{ file_t( path, "w+" ); return  1;
+        try{ static_cast<void>(file_t( path, "w+" )); return  1;
            } catch(...){} return 0;
     }
 
@@ -206,7 +206,7 @@ namespace nodepp::fs {
 
     inline long folder_size( const string_t& path ){
           auto list = read_folder( path );
-        return list.size();
+        return (long)list.size();
     }
 
     /*─······································································─*/

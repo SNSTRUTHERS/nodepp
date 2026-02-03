@@ -40,7 +40,7 @@ namespace nodepp::limit {
     inline int set_hard_fileno( uint value ) { return _setmaxstdio( value ); }
 
     inline int set_soft_fileno( uint value ) { return _setmaxstdio( value ); }
-    
+
     /*─······································································─*/
 
     inline uint get_hard_fileno() { return _getmaxstdio(); }
@@ -55,7 +55,7 @@ namespace nodepp::limit {
 
     inline uint get_hard_thread_pool() {
         MEMORYSTATUSEX status; status.dwLength = sizeof(status);
-        if( GlobalMemoryStatusEx(&status) ) 
+        if( GlobalMemoryStatusEx(&status) )
           { return (uint)((status.ullTotalVirtual/(1024*1024))*0.9); }
     return 1024; }
 

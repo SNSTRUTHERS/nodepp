@@ -36,7 +36,7 @@
 
 namespace nodepp::_socket_ {
 
-    inline void start_device(){ 
+    inline void start_device(){
     thread_local static bool sockets=false;
         if( sockets == false ){ /*unused*/ }
         sockets = true;
@@ -64,9 +64,9 @@ class socket_t {
 protected:
 
     void kill() const noexcept {
-        obj->state |= STATE::FS_STATE_KILL; 
-        ::shutdown( obj->fd,SHUT_RDWR ); 
-        ::close   ( obj->fd ); 
+        obj->state |= STATE::FS_STATE_KILL;
+        ::shutdown( obj->fd,SHUT_RDWR );
+        ::close   ( obj->fd );
     }
 
     bool is_state( uchar value ) const noexcept {
@@ -97,14 +97,14 @@ protected:
 
     struct NODE {
 
-        ulong recv_timeout=0; 
+        ulong recv_timeout=0;
         ulong send_timeout=0;
         ulong conn_timeout=0;
         ulong range[2]= { 0, 0 };
 
         socklen_t addrlen, len;
         SOCKADDR server_addr, client_addr;
-        int fd = -1, feof = 1; bool srv=0; 
+        int fd = -1, feof = 1; bool srv=0;
         uchar state = STATE::FS_STATE_OPEN;
 
         ptr_t<char> buffer; string_t borrow;
@@ -140,9 +140,9 @@ public:
 
     /*─······································································─*/
 
-    int SOCK    = SOCK_STREAM;
-    int AF      = AF_INET;
-    int IPPROTO = 0;
+    int SOCK       = SOCK_STREAM;
+    sa_family_t AF = AF_INET;
+    int IPPROTO    = 0;
 
     /*─······································································─*/
 
@@ -162,33 +162,33 @@ public:
 
     ulong set_conn_timeout( ulong time ) const noexcept {
         if( time == 0 ){ obj->conn_timeout = 0; return 0; }
-        obj->conn_timeout = process::millis() + time; 
+        obj->conn_timeout = process::millis() + time;
         return time;
     }
 
     ulong set_recv_timeout( ulong time ) const noexcept {
         if( time == 0 ){ obj->recv_timeout = 0; return 0; }
         TIMEVAL en; memset( &en, 0, sizeof(en) ); en.tv_sec = time / 1000; en.tv_usec = 0;
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&en, sizeof(en) );
         obj->recv_timeout = process::millis() + time; return c==0 ? time : 0;
     }
 
     ulong set_send_timeout( ulong time ) const noexcept {
         if( time == 0 ){ obj->send_timeout = 0; return 0; }
         TIMEVAL en; memset( &en, 0, sizeof(en) ); en.tv_sec = time / 1000; en.tv_usec = 0;
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_SNDTIMEO, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_SNDTIMEO, (char*)&en, sizeof(en) );
         obj->send_timeout = process::millis() + time; return c==0 ? time : 0;
     }
 
     /*─······································································─*/
 
     int set_no_delay_mode( uint en ) const noexcept { if( IPPROTO != IPPROTO_TCP ){ return -1; }
-    int c= setsockopt( obj->fd, IPPROTO, TCP_NODELAY, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, IPPROTO, TCP_NODELAY, (char*)&en, sizeof(en) );
         return c;
     }
 
     int set_recv_buff( uint en ) const noexcept {
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_RCVBUF, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_RCVBUF, (char*)&en, sizeof(en) );
         return c;
     }
 
@@ -198,7 +198,7 @@ public:
     }
 
     int set_accept_connection( uint en ) const noexcept {
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_ACCEPTCONN, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_ACCEPTCONN, (char*)&en, sizeof(en) );
         return c;
     }
 
@@ -208,22 +208,22 @@ public:
     }
 
     int set_keep_alive( uint en ) const noexcept {
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&en, sizeof(en) );
         return c;
     }
 
     int set_broadcast( uint en ) const noexcept {
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_BROADCAST, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_BROADCAST, (char*)&en, sizeof(en) );
         return c;
     }
 
     int set_reuse_address( uint en ) const noexcept {
-    int c= setsockopt( obj->fd, SOL_SOCKET, SO_REUSEADDR, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, SOL_SOCKET, SO_REUSEADDR, (char*)&en, sizeof(en) );
         return c;
     }
 
     int set_ipv6_only_mode( uint en ) const noexcept {
-    int c= setsockopt( obj->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&en, sizeof(en) ); 
+    int c= setsockopt( obj->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&en, sizeof(en) );
         return c;
     }
 
@@ -235,32 +235,32 @@ public:
 #endif
 
     int get_no_delay_mode() const noexcept { int en; socklen_t size = sizeof(en);
-    int c= getsockopt( obj->fd, IPPROTO, TCP_NODELAY, (char*)&en, &size ); 
+    int c= getsockopt( obj->fd, IPPROTO, TCP_NODELAY, (char*)&en, &size );
         return c==0 ? en : c;
     }
 
     int get_error() const noexcept { int en; socklen_t size = sizeof(en);
-    int c= getsockopt(obj->fd, SOL_SOCKET, SO_ERROR, (char*)&en, &size); 
+    int c= getsockopt(obj->fd, SOL_SOCKET, SO_ERROR, (char*)&en, &size);
         return c==0 ? en : c;
     }
 
     int get_recv_buff() const noexcept { int en; socklen_t size = sizeof(en);
-    int c= getsockopt(obj->fd, SOL_SOCKET, SO_RCVBUF, (char*)&en, &size); 
+    int c= getsockopt(obj->fd, SOL_SOCKET, SO_RCVBUF, (char*)&en, &size);
         return c==0 ? en : c;
     }
 
     int get_send_buff() const noexcept { int en; socklen_t size = sizeof(en);
-    int c= getsockopt(obj->fd, SOL_SOCKET, SO_SNDBUF, (char*)&en, &size); 
+    int c= getsockopt(obj->fd, SOL_SOCKET, SO_SNDBUF, (char*)&en, &size);
         return c==0 ? en : c;
     }
 
     int get_accept_connection() const noexcept { int en; socklen_t size = sizeof(en);
-    int c= getsockopt(obj->fd, SOL_SOCKET, SO_ACCEPTCONN, (char*)&en, &size); 
+    int c= getsockopt(obj->fd, SOL_SOCKET, SO_ACCEPTCONN, (char*)&en, &size);
         return c==0 ? en : c;
     }
 
     int get_dont_route() const noexcept { int en; socklen_t size = sizeof(en);
-    int c= getsockopt(obj->fd, SOL_SOCKET, SO_DONTROUTE, (char*)&en, &size); 
+    int c= getsockopt(obj->fd, SOL_SOCKET, SO_DONTROUTE, (char*)&en, &size);
         return c==0 ? en : c;
     }
 
@@ -297,13 +297,13 @@ public:
 
     string_t get_sockname() const noexcept { SOCKADDR* cli = get_addr();
     int c= getsockname( obj->fd, cli, &obj->len ); string_t buff { INET_ADDRSTRLEN };
-        inet_ntop( AF, &(((SOCKADDR_IN*)cli)->sin_addr), (char*)buff, buff.size() );
+        inet_ntop( AF, &(((SOCKADDR_IN*)cli)->sin_addr), (char*)buff, (uint)buff.size() );
         return c < 0 ? "127.0.0.1" : buff;
     }
 
     string_t get_peername() const noexcept { SOCKADDR* cli = get_addr();
     int c= getpeername( obj->fd, cli, &obj->len ); string_t buff { INET_ADDRSTRLEN };
-        inet_ntop( AF, &(((SOCKADDR_IN*)cli)->sin_addr), (char*)buff, buff.size() );
+        inet_ntop( AF, &(((SOCKADDR_IN*)cli)->sin_addr), (char*)buff, (uint)buff.size() );
         return c < 0 ? "127.0.0.1" : buff;
     }
 
@@ -314,7 +314,7 @@ public:
     /*─······································································─*/
 
     ulong set_buffer_size( ulong _size ) const noexcept {
-        set_send_buff( _size ); set_recv_buff( _size );
+        set_send_buff( (uint)_size ); set_recv_buff( (uint)_size );
         obj->buffer = ptr_t<char>(_size); return _size;
     }
 
@@ -344,7 +344,7 @@ public:
 
     void close() const noexcept {
         if( is_state ( STATE::FS_STATE_DISABLE ) ){ return; }
-            set_state( STATE::FS_STATE_CLOSE   ); DONE:;
+            set_state( STATE::FS_STATE_CLOSE   ); [[maybe_unused]] DONE:;
     onDrain.emit(); free(); }
 
     /*─······································································─*/
@@ -393,9 +393,9 @@ public:
     agent_t get_sockopt() const noexcept {
     agent_t opt;
         opt.reuse_address = get_reuse_address();
-        opt.recv_timeout  = get_recv_timeout();
-        opt.send_timeout  = get_send_timeout();
-        opt.conn_timeout  = get_conn_timeout();
+        opt.recv_timeout  = (uint)get_recv_timeout();
+        opt.send_timeout  = (uint)get_send_timeout();
+        opt.conn_timeout  = (uint)get_conn_timeout();
         opt.buffer_size   = get_buffer_size();
     #ifdef SO_REUSEPORT
         opt.reuse_port    = get_reuse_port();
@@ -411,7 +411,7 @@ public:
         if( fd == INVALID_SOCKET ){ throw except_t("Such Socket has an Invalid fd"); }
         obj->fd = fd; set_nonbloking_mode(); set_buffer_size(_size);
     }
-    
+
    ~socket_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
 
     socket_t() noexcept : obj( new NODE() ) { _socket_::start_device(); }
@@ -421,10 +421,10 @@ public:
     void free() const noexcept {
 
         if( is_state( STATE::FS_STATE_REUSE ) && obj.count()>1 ){ return; }
-        if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; } 
+        if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
           { kill(); onDrain.emit(); } else { kill(); }
-       
+
         onUnpipe.clear(); onResume.clear();
         onError .clear(); onData  .clear();
         onOpen  .clear(); onPipe  .clear(); onClose.emit();
@@ -452,7 +452,7 @@ public:
         SOCKADDR_IN server, client;
         memset(&server, 0, sizeof(SOCKADDR_IN));
         memset(&client, 0, sizeof(SOCKADDR_IN));
-        server.sin_family = AF; if( port>0 ) server.sin_port = htons(port);
+        server.sin_family = (sa_family_t)AF; if( port>0 ) server.sin_port = htons((uint16_t)port);
 
           if( host == "0.0.0.0"         || host == "global"    ){ server.sin_addr.s_addr = INADDR_ANY; }
         elif( host == "1.1.1.1"         || host == "loopback"  ){ server.sin_addr.s_addr = INADDR_LOOPBACK; }
@@ -481,7 +481,7 @@ public:
 
     inline int _listen() const noexcept { int c = 0;
         if( process::millis() > get_conn_timeout() || obj->srv == 0 ){ return -1; }
-        return is_blocked( c=::listen( obj->fd, limit::get_soft_fileno() ) ) ? -2 : c;
+        return is_blocked( c=::listen( obj->fd, (int)limit::get_soft_fileno() ) ) ? -2 : c;
     }
 
     /*─······································································─*/
@@ -553,12 +553,12 @@ public:
     virtual int __read( char* bf, const ulong& sx ) const noexcept {
         if ( process::millis() > get_recv_timeout() || is_closed() )
            { return -1; } if ( sx==0 ) { return 0; }
-           
+
         if ( SOCK != SOCK_DGRAM ){
-            obj->feof = ::recv( obj->fd, bf, sx, 0 );
+            obj->feof = (int)::recv( obj->fd, bf, sx, 0 );
             obj->feof = is_blocked(obj->feof)? -2 : obj->feof;
         } else {
-            obj->feof = ::recvfrom( obj->fd, bf, sx, 0, get_addr(), &obj->len );
+            obj->feof = (int)::recvfrom( obj->fd, bf, sx, 0, get_addr(), &obj->len );
             obj->feof = is_blocked(obj->feof)? -2 : obj->feof;
         }
 
@@ -570,13 +570,13 @@ public:
            { return -1; } if ( sx==0 ) { return 0; }
 
         if ( SOCK != SOCK_DGRAM ){
-            obj->feof = ::send( obj->fd, bf, sx, 0 );
+            obj->feof = (int)::send( obj->fd, bf, sx, 0 );
             obj->feof = is_blocked(obj->feof)? -2 : obj->feof;
         } else {
-            obj->feof = ::sendto( obj->fd, bf, sx, 0, get_addr(), obj->len );
+            obj->feof = (int)::sendto( obj->fd, bf, sx, 0, get_addr(), obj->len );
             obj->feof = is_blocked(obj->feof)? -2 : obj->feof;
         }
-        
+
     if( obj->feof <= 0 && obj->feof != -2 ){ return -1; }
     return obj->feof; }
 
@@ -586,7 +586,7 @@ public:
         if( sx==0 || is_closed() ){ return 1; } while( *sy<sx ) {
             int c = __write( bf + *sy, sx - *sy );
             if( c <= 0 && c != -2 ) /*----*/ { return 0; }
-            if( c >  0 ){ *sy+= c; continue; } return 1;
+            if( c >  0 ){ *sy+= (ulong)c; continue; } return 1;
         }   return 0;
     }
 
@@ -594,7 +594,7 @@ public:
         if( sx==0 || is_closed() ){ return 1; } while( *sy<sx ) {
             int c = __read( bf + *sy, sx - *sy );
             if( c <= 0 && c != -2 ) /*----*/ { return 0; }
-            if( c >  0 ){ *sy+= c; continue; } return 1;
+            if( c >  0 ){ *sy+= (ulong)c; continue; } return 1;
         }   return 0;
     }
 

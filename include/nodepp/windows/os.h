@@ -25,35 +25,35 @@ namespace nodepp::os {
         char buffer[UNBFF_SIZE]; DWORD bufferSize = UNBFF_SIZE;
         GetComputerNameA(buffer,&bufferSize); return string_t( buffer, bufferSize );
     }
-    
+
     /*─······································································─*/
 
-    inline string_t user(){ 
+    inline string_t user(){
         char buffer[UNBFF_SIZE]; DWORD bufferSize = UNBFF_SIZE;
         GetUserNameA(buffer, &bufferSize); return string_t( buffer, bufferSize );
     }
-    
+
     /*─······································································─*/
 
     inline string_t cwd(){ char buffer[ UNBFF_SIZE ];
         DWORD length = GetCurrentDirectoryA( UNBFF_SIZE, buffer );
         return string_t( buffer, length );
     }
-    
+
     /*─······································································─*/
 
-    inline uint cpus(){ 
+    inline uint cpus(){
         SYSTEM_INFO sysInfo; GetSystemInfo(&sysInfo);
         return sysInfo.dwNumberOfProcessors;
     }
-    
+
     /*─······································································─*/
 
     inline string_t tmp(){ string_t tmp (MAX_PATH);
         GetTempPathA( MAX_PATH, tmp.data() );
         return tmp;
     }
-    
+
     /*─······································································─*/
 
     inline int exec( string_t cmd ){ return ::system( cmd.get() ); }

@@ -44,7 +44,7 @@ protected:
 
         if( pattern[off] == '{' ){
             auto end = get_next_key( pattern, off ); /*----------*/
-            auto out = get_rep( pattern, off, end ); off = end + 1;
+            auto out = get_rep( pattern, (int)off, end ); off = (ulong)end + 1;
         return out; }
 
         elif( pattern[off]=='?' ){ return ptr_t<int>({ 0, 1 }); ++off; }
@@ -57,8 +57,8 @@ protected:
     ptr_t<int>     rep({ 0, 0 }); bool b=0; string_t num[2];
 
         pattern.slice_view( start+1, end ).map([&]( char& data ){
-            if  (!string::is_digit(data) ){ b =! b; }
-            elif( string::is_digit(data) ){ num[b].push(data); }
+            if  (!string::is_digit((uchar)data) ){ b =! b; }
+            elif( string::is_digit((uchar)data) ){ num[b].push(data); }
         });
 
         if( !num[0].empty() ){ rep[0] =string::to_int(num[0]);
@@ -71,15 +71,15 @@ protected:
     queue_t<int> out;
 
         while( off < pattern.size() ){
-           if( pattern[off] == '|' ){ out.push(off); off++; }
+           if( pattern[off] == '|' ){ out.push((int)off); off++; }
            if( pattern[off] == '[' || /*-------------------*/
                pattern[off] == '{' || /*-------------------*/
                pattern[off] == '(' // /*-------------------*/
-           ) { off = get_next_key( pattern,off ); continue; }
+           ) { off = (ulong)get_next_key( pattern,off ); continue; }
            if( pattern[off] == '\\'){ ++off; } /*-*/ ++off;
         }
 
-    out.push( pattern.size() ); return out.data(); }
+    out.push( (int)pattern.size() ); return out.data(); }
 
     inline int get_next_key( const string_t& pattern, ulong off ) const noexcept {
         uchar k=0; while( off < pattern.size() && k < 128 ){
@@ -91,7 +91,7 @@ protected:
             }
 
             if( k == 0 ){ break; } /*------*/ ++off;
-        }   return off == pattern.size() ? -1 : off;
+        }   return off == pattern.size() ? -1 : (int)off;
     }
 
     /*─······································································─*/
@@ -101,13 +101,13 @@ protected:
 
         for( ulong x=0; x<pattern.size(); ++x ){
         if ( pattern[x] == '\\' ){ /*--*/ ++x;
-        if ( x < pattern.size() ){ REGEX item; item.flag=0x00; item.data=pattern[x]; next->push(item); }
+        if ( x < pattern.size() ){ REGEX item; item.flag=0x00; item.data=(uchar)pattern[x]; next->push(item); }
         } elif ( pattern[x+1]=='-' && (x+2)<pattern.size() ){
             auto a = min( pattern[x], pattern[x+2] ); /*---*/
             auto b = max( pattern[x], pattern[x+2] ); x += 2;
-            for( uchar y=a; y<=b; ++y )
+            for( auto y=(uchar)a; y<=b; ++y )
                { REGEX item; item.flag=0x00; item.data=y; /*----*/ next->push(item); }
-        } else { REGEX item; item.flag=0x00; item.data=pattern[x]; next->push(item); }}
+        } else { REGEX item; item.flag=0x00; item.data=(uchar)pattern[x]; next->push(item); }}
 
     return node; }
 
@@ -124,17 +124,17 @@ protected:
         elif( pattern[off]=='[' ){
         int end=0; if(( end=get_next_key(pattern,off) )==-1 ){ /*-------------*/
             throw except_t(string::format( "regex: %d %c", off, pattern[off] ));
-        }   int beg = pattern[off+1]=='^'? off+2:off+1;
+        }   int beg = pattern[off+1]=='^'? (int)off+2:(int)off+1;
             item=compile_range(pattern.slice(beg,end));
             item.data=pattern[off+1]=='^'? 0xff : 0x00;
-            item.flag=0x08; off=end; /*--------------*/
+            item.flag=0x08; off=(ulong)end; /*--------------*/
         }
 
         elif( pattern[off]== '(' ){
         int end=0; if(( end=get_next_key(pattern,off) )==-1 ){ /*-------------*/
             throw except_t(string::format( "regex: %d %c", off, pattern[off] ));
-        }   item=compile(pattern.slice( off+1, end ));
-            item.data=0xff; item.flag=0x09; off=end;
+        }   item=compile(pattern.slice( (long)off+1, end ));
+            item.data=0xff; item.flag=0x09; off=(ulong)end;
         }
 
         elif( pattern[off] == '$' ){ item.data=0x00; item.flag=0x01; }
@@ -153,8 +153,8 @@ protected:
         elif( pattern[off] == 'n' ){ item.data=0xff; item.flag=0x07; }
         elif( pattern[off] == 'N' ){ item.data=0x00; item.flag=0x07; }
 
-        else{ item.data=pattern[off]; item.flag=0x00; }}
-        else{ item.data=pattern[off]; item.flag=0x00; }
+        else{ item.data=(uchar)pattern[off]; item.flag=0x00; }}
+        else{ item.data=(uchar)pattern[off]; item.flag=0x00; }
 
         if( pattern[off+1] == '+' || pattern[off+1] == '?' ||
             pattern[off+1] == '*' || pattern[off+1] == '{' //
@@ -173,9 +173,9 @@ protected:
         auto reg =get_next_regex( pattern,0 );
         auto addr=reg.begin(); ulong x=0, y=0;
 
-        while( addr != reg.end() ){ y=*addr;
-        node.next.push( compile_pattern(pattern.slice(x,y)) );
-        x=*addr+1; ++addr; } /*-----------------------------*/
+        while( addr != reg.end() ){ y=(ulong)*addr;
+        node.next.push( compile_pattern(pattern.slice((long)x,(long)y)) );
+        x=(ulong)*addr+1; ++addr; } /*-----------------------------*/
 
     } while(0); return node; }
 
@@ -203,28 +203,28 @@ protected:
         if  ( offset==0|| offset>=value.last()   ){ return 1; }}
 
         elif( item.flag==0x04 && item.data==0x00 ){
-        if(!( string::is_alnum( value[offset] )) ){ return 1; }}
+        if(!( string::is_alnum( (uchar)value[offset] )) ){ return 1; }}
 
         elif( item.flag==0x04 && item.data==0xff ){
-        if  ( string::is_alnum( value[offset] )  ){ return 1; }}
+        if  ( string::is_alnum( (uchar)value[offset] )  ){ return 1; }}
 
         elif( item.flag==0x05 && item.data==0x00 ){
-        if(!( string::is_digit( value[offset] ))){ return 1; }}
+        if(!( string::is_digit( (uchar)value[offset] ))){ return 1; }}
 
         elif( item.flag==0x05 && item.data==0xff ){
-        if  ( string::is_digit( value[offset] )  ){ return 1; }}
+        if  ( string::is_digit( (uchar)value[offset] )  ){ return 1; }}
 
         elif( item.flag==0x06 && item.data==0x00 ){
-        if(!( string::is_space( value[offset] ))){ return 1; }}
+        if(!( string::is_space( (uchar)value[offset] ))){ return 1; }}
 
         elif( item.flag==0x06 && item.data==0xff ){
-        if  ( string::is_space( value[offset] )  ){ return 1; }}
+        if  ( string::is_space( (uchar)value[offset] )  ){ return 1; }}
 
         elif( item.flag==0x07 && item.data==0x00 ){
-        if(!( string::is_print( value[offset] )) ){ return 1; }}
+        if(!( string::is_print( (uchar)value[offset] )) ){ return 1; }}
 
         elif( item.flag==0x07 && item.data==0xff ){
-        if  ( string::is_print( value[offset] )  ){ return 1; }}
+        if  ( string::is_print( (uchar)value[offset] )  ){ return 1; }}
 
         /*─·································································─*/
 
@@ -242,19 +242,19 @@ protected:
 
         elif( item.flag==0x08 && item.data==0xff && obj->icase ){
         if  ( item.next.none([&]( REGEX x ){
-              return string::to_lower(x.data)==string::to_lower(value[offset]);
+              return string::to_lower(x.data)==string::to_lower((uchar)value[offset]);
         }) ){ return 1; }}
 
         elif( item.flag==0x08 && item.data==0x00 && obj->icase ){
         if  ( item.next.some([&]( REGEX x ){
-              return string::to_lower(x.data)==string::to_lower(value[offset]);
+              return string::to_lower(x.data)==string::to_lower((uchar)value[offset]);
         }) ){ return 1; }}
 
         /*─·································································─*/
 
         elif( item.flag==0x00 ){
-            char a = obj->icase? string::to_lower(item.data)/**/ : item.data;
-            char b = obj->icase? string::to_lower(value[offset]) : value[offset];
+            char a = obj->icase? string::to_lower(item.data)/**/ : (char)item.data;
+            char b = obj->icase? string::to_lower((uchar)value[offset]) : value[offset];
         return a == b ? 1 : -1; }
 
         /*─·································································─*/
@@ -263,7 +263,7 @@ protected:
         while( x != nullptr ){ /*----------------*/ auto y=x->next;
         /*---------------------------------------*/ auto z=_search( value, offset, x->data );
           if  ( z==0 ){ /*-------------------------------------------------*/ x=y; continue; }
-          elif( z>=1 ){ obj->memory.push(value.slice(tmp, tmp+z)); offset=tmp +z ; return z; }
+          elif( z>=1 ){ obj->memory.push(value.slice((long)tmp, (long)tmp+z)); offset=tmp + (ulong)z ; return z; }
           else/*----*/{ /*--------------------------------------*/ offset=tmp;x=y; continue; }
         } return -1; }
 
@@ -276,7 +276,7 @@ protected:
         else /*-----------------*/ { break/**/; }}
 
         /*-------------*/ auto z =_search( value, offset, x->data );
-        if ( z>= 1 ){ offset +=z; } auto y=x->next; ++rep;
+        if ( z>= 1 ){ offset +=(ulong)z; } auto y=x->next; ++rep;
         /**/ out = type::cast<int>( offset - tmp );
 
         if  ( x->data.data==0x00 && x->data.flag==0x09 && z>=1 ){ return out; }
@@ -341,23 +341,23 @@ public:
         auto idx = search_all( _str ); queue_t<string_t> out;
         if ( idx.empty()  ){ out.push(_str); return out.data(); }
         for( auto x : idx ){
-             out.push( _str.slice_view( n, x[0] ) ); n = x[1];
-        }    out.push( _str.slice_view( n ) ); return out.data();
+             out.push( _str.slice_view( (long)n, (long)x[0] ) ); n = x[1];
+        }    out.push( _str.slice_view( (long)n ) ); return out.data();
     }
 
     array_t<string_t> split( const string_t& _str ){ ulong n = 0;
         auto idx = search_all( _str ); queue_t<string_t> out;
         if ( idx.empty()  ){ out.push(_str); return out.data(); }
         for( auto x : idx ){
-             out.push( _str.slice( n, x[0] ) ); n = x[1];
-        }    out.push( _str.slice( n ) ); return out.data();
+             out.push( _str.slice( (long)n, (long)x[0] ) ); n = x[1];
+        }    out.push( _str.slice( (long)n ) ); return out.data();
     }
 
     /*─······································································─*/
 
     string_t replace_all( string_t _str, const string_t& _rep ){
         auto idx = search_all( _str ).reverse(); for( auto x : idx ){
-             _str.splice( x[0], x[1] - x[0], _rep );
+             _str.splice( (long)x[0], x[1] - x[0], _rep );
         }    return _str;
     }
 
@@ -365,14 +365,14 @@ public:
         auto idx = search( _str, off ); /*----------------------*/
         if( idx.null() /*-*/ ){ return _str; } /*---------------*/
         if( idx[0] == idx[1] ){ return _str; } /*---------------*/
-        _str.splice( idx[0], idx[1] - idx[0], _rep ); return _str;
+        _str.splice( (long)idx[0], idx[1] - idx[0], _rep ); return _str;
     }
 
     /*─······································································─*/
 
     string_t remove_all( string_t _str ){
         auto idx = search_all( _str ).reverse(); for( auto x : idx ){
-             _str.splice( x[0], x[1] - x[0] );
+             _str.splice( (long)x[0], x[1] - x[0] );
         }    return _str;
     }
 
@@ -380,7 +380,7 @@ public:
         auto idx = search( _str, off ); /*----------------*/
         if( idx.null() /*-*/ ){ return _str; }  /*--------*/
         if( idx[0] == idx[1] ){ return _str; }  /*--------*/
-        _str.splice( idx[0], idx[1] - idx[0] ); return _str;
+        _str.splice( (long)idx[0], idx[1] - idx[0] ); return _str;
     }
 
     /*─······································································─*/
@@ -388,7 +388,7 @@ public:
     array_t<string_t> match_all( const string_t& _str ){
         auto idx = search_all( _str ); queue_t<string_t> out;
         for( auto x : idx ){ /*---------------*/
-             out.push(_str.slice( x[0], x[1] ));
+             out.push(_str.slice( (long)x[0], (long)x[1] ));
         }    return out.data();
     }
 
@@ -398,7 +398,7 @@ public:
         auto idx = search( _str, off ); /*-----*/
         if( idx.null() /*-*/ ){ return nullptr; }
         if( idx[0] == idx[1] ){ return nullptr; }
-            return _str.slice( idx[0], idx[1] );
+            return _str.slice( (long)idx[0], (long)idx[1] );
     }
 
     /*─······································································─*/
@@ -476,10 +476,10 @@ namespace nodepp::regex {
 
     /*─······································································─*/
 
-    inline array_t<string_t> split_view( const string_t& _str, char ch ){ 
+    inline array_t<string_t> split_view( const string_t& _str, char ch ){
         return string::split_view( _str, ch ); }
 
-    inline array_t<string_t> split_view( const string_t& _str, int  ch ){ 
+    inline array_t<string_t> split_view( const string_t& _str, int  ch ){
         return string::split_view( _str, ch ); }
 
     inline array_t<string_t> split_view( const string_t& _str, const string_t& _reg, bool _flg=false ){
@@ -490,10 +490,10 @@ namespace nodepp::regex {
 
     /*─······································································─*/
 
-    inline array_t<string_t> split( const string_t& _str, char ch ){ 
+    inline array_t<string_t> split( const string_t& _str, char ch ){
         return string::split( _str, ch ); }
 
-    inline array_t<string_t> split( const string_t& _str, int  ch ){ 
+    inline array_t<string_t> split( const string_t& _str, int  ch ){
         return string::split( _str, ch ); }
 
     inline array_t<string_t> split( const string_t& _str, const string_t& _reg, bool _flg=false ){
@@ -522,11 +522,11 @@ namespace nodepp::regex {
         });
 
         for( auto &x: reg[0].search_all( val ) ){
-        auto y = string::to_uint( reg[1].match( val.slice( x[0], x[1] ) ) );
+        auto y = string::to_uint( reg[1].match( val.slice( (long)x[0], (long)x[1] ) ) );
         if ( y >= count ){ break; }
-             out.push( val.slice( idx, x[0]    ) );
+             out.push( val.slice( (long)idx, (long)x[0]    ) );
              out.push( string::get( y, args... ) ); idx = x[1];
-        }    out.push( val.slice( idx ) );
+        }    out.push( val.slice( (long)idx ) );
 
         return array_t<string_t>( out.data() ).join("");
     }

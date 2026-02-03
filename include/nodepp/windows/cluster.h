@@ -24,9 +24,9 @@
 namespace nodepp { class cluster_t : public generator_t {
 protected:
 
-    void kill() const noexcept { if( is_parent() ){ 
-        ::CloseHandle( obj->pi.hProcess ); 
-        ::CloseHandle( obj->pi.hThread ); 
+    void kill() const noexcept { if( is_parent() ){
+        ::CloseHandle( obj->pi.hProcess );
+        ::CloseHandle( obj->pi.hThread );
     } obj->state |= STATE::FS_STATE_KILL; }
 
     using _read_ = generator::file::read;
@@ -67,13 +67,13 @@ protected:
     void _init_( array_t<string_t> arg, array_t<string_t> env ) {
 
         if( process::is_child() ){
-            obj->input = fs::std_output(); obj->error = fs::std_error(); 
-            obj->output= fs::std_input (); set_state( STATE::FS_STATE_OPEN ); 
+            obj->input = fs::std_output(); obj->error = fs::std_error();
+            obj->output= fs::std_input (); set_state( STATE::FS_STATE_OPEN );
         return; }
 
         SECURITY_ATTRIBUTES sa;
         /*---------------*/ sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-        /*---------------*/ sa.lpSecurityDescriptor = NULL; 
+        /*---------------*/ sa.lpSecurityDescriptor = NULL;
         /*---------------*/ sa.bInheritHandle /*-*/ = TRUE;
 
         HANDLE fda[2]; if(!CreatePipe(&fda[0],&fda[1],&sa,CHUNK_SIZE)){ throw except_t( "while piping stdin"  ); }
@@ -122,20 +122,20 @@ public:
     event_t<string_t>  onDout;
     event_t<string_t>  onDerr;
 
-    cluster_t( const initializer_t<string_t>& args, const initializer_t<string_t>& envs ) 
+    cluster_t( const initializer_t<string_t>& args, const initializer_t<string_t>& envs )
     : obj( new NODE() ) { _init_( args, envs ); }
 
    ~cluster_t() noexcept { if( obj.count()>1 && !is_closed() ){ return; } free(); }
 
     cluster_t() : obj( new NODE() ){ _init_( nullptr, nullptr ); }
 
-    cluster_t( const initializer_t<string_t>& args ) 
+    cluster_t( const initializer_t<string_t>& args )
     : obj( new NODE() ) { _init_( args, nullptr ); }
 
     /*─······································································─*/
 
     void free() const noexcept {
-        
+
         if( is_state( STATE::FS_STATE_REUSE ) && obj.count()>1 ){ return; }
         if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
@@ -146,31 +146,31 @@ public:
         obj->error.close();
     */
 
-        onResume.clear(); onError.clear(); 
-        onOpen  .clear(); onDerr .clear(); 
+        onResume.clear(); onError.clear();
+        onOpen  .clear(); onDerr .clear();
         onData  .clear(); onDout .clear(); onClose.emit();
-        
+
     }
 
     /*─······································································─*/
 
     inline int next() noexcept {
         if( is_closed() ){ free(); return -1; }
-    coBegin ; onOpen.emit(); 
-    
+    coBegin ; onOpen.emit();
+
         coYield(1); coDelay( 100 ); do {
         if((*_read1)(&readable())==1)  { coGoto(2); }
         if(  _read1->state <= 0 )      { coGoto(2); }
         onData.emit(_read1->data);
-        onDout.emit(_read1->data); coNext; } while(1);    
-        
+        onDout.emit(_read1->data); coNext; } while(1);
+
         coYield(2); coDelay( 100 );  do {
         if( process::is_child() )       { coGoto(1); }
         if((*_read2)(&std_error())==1 ) { coGoto(1); }
         if(  _read2->state <= 0 )       { coGoto(1); }
         onData.emit(_read2->data);
         onDerr.emit(_read2->data); coNext; } while(0);
-        
+
     coGoto(1); coFinish
     }
 

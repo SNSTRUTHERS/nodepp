@@ -27,15 +27,15 @@ namespace nodepp::timer {
     template< class V, class... T >
     ptr_t<task_t> add ( V func, ulong* time, const T&... args ){
         auto prs = generator::timer::timer();
-        return process::add( prs, func, time, args... ); 
+        return process::add( prs, func, time, args... );
     }
-    
+
     template< class V, class... T >
     ptr_t<task_t> add ( V func, ulong time, const T&... args ){
         auto prs = generator::timer::timer();
-        return process::add( prs, func, time, args... ); 
+        return process::add( prs, func, time, args... );
     }
-    
+
     /*─······································································─*/
 
     template< class V, class... T >
@@ -47,7 +47,7 @@ namespace nodepp::timer {
     ptr_t<task_t> timeout ( V func, ulong time, const T&... args ){
         return timer::add([=]( T... args ){ func(args...); return -1; }, time, args... );
     }
-    
+
     /*─······································································─*/
 
     template< class V, class... T >
@@ -59,36 +59,36 @@ namespace nodepp::timer {
     ptr_t<task_t> interval( V func, ulong time, const T&... args ){
         return timer::add([=]( T... args ){ func(args...); return 1; }, time, args... );
     }
-    
+
     /*─······································································─*/
-    
+
     inline void await( ulong* time ){ process::await( coroutine::add( COROUTINE(){
     coBegin ; coDelay( *time ) ; coFinish }) ); }
 
     inline void await( ulong time ){ await( type::cast<ulong>( &time ) ); }
-    
+
     /*─······································································─*/
 
     inline void clear( ptr_t<task_t> address ){ process::clear( address ); }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace utimer {
-    
+namespace nodepp::utimer {
+
     template< class V, class... T >
     ptr_t<task_t> add ( V func, ulong* time, const T&... args ){
         auto prs = generator::timer::utimer();
-        return process::add( prs, func, time, args... ); 
+        return process::add( prs, func, time, args... );
     }
-    
+
     template< class V, class... T >
     ptr_t<task_t> add ( V func, ulong time, const T&... args ){
         auto prs = generator::timer::utimer();
-        return process::add( prs, func, time, args... ); 
+        return process::add( prs, func, time, args... );
     }
-    
+
     /*─······································································─*/
 
     template< class V, class... T >
@@ -100,7 +100,7 @@ namespace nodepp { namespace utimer {
     ptr_t<task_t> timeout ( V func, ulong time, const T&... args ){
         return utimer::add([=]( T... args ){ func(args...); return -1; }, time, args... );
     }
-    
+
     /*─······································································─*/
 
     template< class V, class... T >

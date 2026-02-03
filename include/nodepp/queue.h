@@ -66,7 +66,7 @@ protected:
         ulong b = clamp( (ulong)x, 0UL, a        );
         ulong c = a - b + 1;
 
-        ptr_t<ulong> arr ( 3UL, 0UL ); 
+        ptr_t<ulong> arr ( 3UL, 0UL );
         arr[0] = b; arr[1] = a; arr[2] = c; return arr;
     }
 
@@ -100,14 +100,14 @@ public:
     /*─······································································─*/
 
     queue_t<V> sort( function_t<bool,V,V> func ) const noexcept {
-    queue_t<V> n_buffer; auto x = this->first(); 
+    queue_t<V> n_buffer; auto x = this->first();
 
     while( x != nullptr ){
 
-        if(!n_buffer.empty() && !func( x->data, n_buffer.last()->data ) ) 
+        if(!n_buffer.empty() && !func( x->data, n_buffer.last()->data ) )
           { n_buffer.push( x->data ); } else {
-            auto n = n_buffer.first(); while( n != nullptr ){ 
-                if( !func( x->data, n->data ) ) { n = n->next; continue; } 
+            auto n = n_buffer.first(); while( n != nullptr ){
+                if( !func( x->data, n->data ) ) { n = n->next; continue; }
             break; } n_buffer.insert( n, x->data );
         }
 
@@ -153,7 +153,7 @@ public:
         n = n->next; } return i;
     }
 
-    queue_t reverse() const noexcept { 
+    queue_t reverse() const noexcept {
         auto n_buffer=queue_t<V>(); auto n=first();
         while( n!=nullptr ){ /*------------------*/
             n_buffer.unshift( n->data );
@@ -210,8 +210,8 @@ public:
 	    auto r = get_slice_range( start,size() );
         if ( r.null() ){ return nullptr; }
 
-        auto n = get( r[0] ); 
-        
+        auto n = get( r[0] );
+
         while( n!=nullptr && idx<r[2] )
              { n_buffer.push( n->data ); n=n->next; ++idx; }
         return n_buffer;
@@ -224,8 +224,8 @@ public:
 	    auto r = get_slice_range( start, end );
         if ( r.null() ){ return nullptr; }
 
-        auto n = get( r[0] ); 
-        
+        auto n = get( r[0] );
+
         while( n!=nullptr && idx<r[2] )
              { n_buffer.push( n->data ); n=n->next; ++idx; }
         return n_buffer;
@@ -240,8 +240,8 @@ public:
 	    auto r = get_splice_range( start, end );
         if ( r.null() ){ return nullptr; }
 
-        auto n = get( r[0] ); 
-        
+        auto n = get( r[0] );
+
         while( n!=nullptr && idx<=r[2] )
              { n_buffer.push( n->data ); n=n->next; ++idx; }
 
@@ -256,8 +256,8 @@ public:
 	    auto r = get_splice_range( start, end );
         if ( r.null() ){ return nullptr; }
 
-        auto n = get( r[0] ); 
-        
+        auto n = get( r[0] );
+
         while( n!=nullptr && idx<=r[2] )
              { n_buffer.push( n->data ); n=n->next; ++idx; }
 
@@ -313,11 +313,11 @@ public:
 
     inline void insert( NODE* n, const V& value ) const noexcept {
         if( empty() ){
-            obj->fst = new NODE( value ); 
+            obj->fst = new NODE( value );
             obj->fst->sign = &obj;
             obj->lst=first();
         } elif ( is_valid(n) ) {
-            auto m = new NODE( value ); 
+            auto m = new NODE( value );
                  m->sign = &obj; m->prev = n->prev;
             if ( n->prev!= nullptr ){ n->prev->next = m; }
             if ( n->next== nullptr ){ obj->lst = n; }
@@ -355,9 +355,9 @@ public:
         if( n->prev == nullptr )/*-*/{ obj->fst= n->next; }
         if( n == obj->act ){ next(); } do {
         if( n->prev != nullptr )/*-*/{ n->prev->next = n->next; }
-        if( n->next != nullptr )/*-*/{ n->next->prev = n->prev; }} while(0); 
-          
-        n->sign = nullptr; /*--------------*/ obj->length--; 
+        if( n->next != nullptr )/*-*/{ n->next->prev = n->prev; }} while(0);
+
+        n->sign = nullptr; /*--------------*/ obj->length--;
         n->next = nullptr; n->prev = nullptr; delete n;
     }
 

@@ -33,7 +33,9 @@
 
 namespace nodepp::process {
 
-    event_t<int> onSIGERROR; event_t<> onSIGEXIT; event_t<> onSIGCLOSE;
+    inline event_t<int> onSIGERROR;
+    inline event_t<> onSIGEXIT;
+    inline event_t<> onSIGCLOSE;
 
     namespace signal {
 

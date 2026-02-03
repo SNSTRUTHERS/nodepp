@@ -65,8 +65,8 @@ namespace string {
 
     /*─······································································─*/
 
-    inline char to_upper( uchar c ){ return is_lower(c) ? ( c - 'a' + 'A' ) : c; }
-    inline char to_lower( uchar c ){ return is_upper(c) ? ( c - 'A' + 'a' ) : c; }
+    inline char to_upper( uchar c ){ return is_lower(c) ? char( c - 'a' + 'A' ) : char(c); }
+    inline char to_lower( uchar c ){ return is_upper(c) ? char( c - 'A' + 'a' ) : char(c); }
 
     /*─······································································─*/
 
@@ -86,15 +86,15 @@ protected:
 
         if( empty() || x == y ){ return nullptr; } if( y>0 ){ --y; }
 
-        if( x < 0 ){ x = size() + x; } if( (ulong)x > last() ){ return nullptr; }
-        if( y < 0 ){ y = last() + y; } if( (ulong)y > last() ){ y = last(); }
+        if( x < 0 ){ x = (long)size() + x; } if( (ulong)x > last() ){ return nullptr; }
+        if( y < 0 ){ y = (long)last() + y; } if( (ulong)y > last() ){ y = (long)last(); }
         if( y < x ){ return nullptr; }
 
-        ulong a = clamp( first() + y, 0UL, last() );
-        ulong b = clamp( first() + x, 0UL, a      );
+        ulong a = clamp( first() + (ulong)y, 0UL, last() );
+        ulong b = clamp( first() + (ulong)x, 0UL, a      );
         ulong c = a - b + 1;
 
-        ptr_t<ulong> arr ( 3UL, 0UL ); 
+        ptr_t<ulong> arr ( 3UL, 0UL );
         arr[0] = b; arr[1] = a; arr[2] = c; return arr;
     }
 
@@ -102,15 +102,15 @@ protected:
 
         if( empty() || y == 0 ){ return nullptr; }
 
-        if( x < 0 ){ x = last() + x; } if( (ulong)x > last() ){ return nullptr; }
-            y += x - 1;
+        if( x < 0 ){ x = (long)last() + x; } if( (ulong)x > last() ){ return nullptr; }
+            y += (ulong)x - 1;
         if( y > last() ){ y= last(); } if( y < (ulong)x ){ return nullptr; }
 
         ulong a = clamp( first() + y, 0UL, last() );
-        ulong b = clamp( first() + x, 0UL, a      );
+        ulong b = clamp( first() + (ulong)x, 0UL, a      );
         ulong c = a - b + 1;
 
-        ptr_t<ulong> arr ( 3UL, 0UL ); 
+        ptr_t<ulong> arr ( 3UL, 0UL );
         arr[0] = b; arr[1] = a; arr[2] = c; return arr;
     }
 
@@ -157,7 +157,7 @@ public:
     string_t operator+=( const string_t& oth ) noexcept {
         if( oth.empty() ){ return *this; } auto slf=copy();
         buffer = string::buffer( slf.size() + oth.size() );
-        memcpy( begin()+slf.size () ,oth.begin(), oth.size() ); 
+        memcpy( begin()+slf.size () ,oth.begin(), oth.size() );
         memcpy( begin(),slf.begin() ,slf.size () ); return *this;
     }
 
@@ -184,7 +184,7 @@ public:
     }
 
     int count( function_t<bool,char> func ) const noexcept {
-        int out=0; auto addr = begin(); while( addr != end() ){
+        [[maybe_unused]] int out=0; auto addr = begin(); while( addr != end() ){
             if( func( *addr ) ){ ++out; }
         ++addr; } return -1;
     }
@@ -226,15 +226,15 @@ public:
     ptr_t<int> find( const string_t& data, ulong offset=0 ) const noexcept {
         if( data.empty() || empty() ){ return nullptr; } /*------*/
 
-        int pos = min( offset, size() ); auto addr = begin() + pos;
+        int pos = (int)min( offset, size() ); auto addr = begin() + pos;
         ptr_t<int> idx ({ pos, pos }); ulong x=0;
 
-        while( addr != end() ){ ++pos; 
+        while( addr != end() ){ ++pos;
            if( data.size() == x ){ break; }
          elif( *addr == data[x] ){ idx[1]=pos; ++x; }
          else{ idx[0]=pos; idx[1]=pos; x=0; }
         ++addr; }
-        
+
         return idx[0]!=idx[1] ? idx : nullptr;
     }
 
@@ -264,7 +264,7 @@ public:
     }
 
     string_t remove( function_t<bool,char> func ) noexcept {
-        ulong n=size(); while( n-->0 ){ 
+        ulong n=size(); while( n-->0 ){
             if( func((*this)[n]) ){ erase(n); }
         } return (*this);
     }
@@ -292,8 +292,8 @@ public:
             n_buffer.insert( n==nullptr ? n_buffer.first() : n->next, x );
         } else { n_buffer.push( x ); } }
 
-    ++addr; } 
-    
+    ++addr; }
+
            n_buffer.push('\0');
     return n_buffer.data(/**/); }
 
@@ -372,7 +372,7 @@ public:
     /*─······································································─*/
 
     void erase( ulong index ) noexcept {
-	    auto r = get_slice_range( index, size() );
+	    auto r = get_slice_range( long(index), (long)size() );
         if ( r.null() ){ return; } else {
             auto n_buffer = string::buffer( size() - 1 );
             memcpy( &n_buffer+r[0], &buffer+r[0]+1, size()-r[0]-1 );
@@ -382,7 +382,7 @@ public:
     }
 
     void erase( ulong start, ulong stop  ) noexcept {
-	    auto r = get_slice_range( start, stop );
+	    auto r = get_slice_range( long(start), long(stop) );
         if ( r.null() ){ return; } else {
             auto n_buffer = string::buffer( size() - r[2] );
             memcpy( &n_buffer+r[0], &buffer+r[1]+1, size()-r[1]-1 );
@@ -394,13 +394,13 @@ public:
     /*─······································································─*/
 
     bool starts_with( string_t pattern ) const noexcept {
-    auto data = slice_view( 0, pattern.size()-1 );
+    auto data = slice_view( 0, (long)pattern.size()-1 );
          if( data.size() != pattern.size() ){ return false; }
          return memcmp( pattern.get(), data.get(), pattern.size() )==0;
     }
 
     bool ends_with( string_t pattern ) const noexcept {
-    auto data = slice_view( size()-pattern.size() );
+    auto data = slice_view( long(size()-pattern.size()) );
          if( data.size() != pattern.size() ){ return false; }
          return memcmp( pattern.get(), data.get(), pattern.size() )==0;
     }
@@ -409,13 +409,13 @@ public:
 
     string_t slice_view( long start, long stop ) const noexcept {
 	    auto r = get_slice_range( start, stop + 1 );
-        if ( r.null() ){ return nullptr; } 
+        if ( r.null() ){ return nullptr; }
         return ptr_t<char>( buffer, r[0], r[0]+r[2] );
     }
 
     string_t slice_view( long start ) const noexcept {
-	    auto r = get_slice_range( start, size() + 1 );
-        if ( r.null() ){ return nullptr; } 
+	    auto r = get_slice_range( start, (long)size() + 1 );
+        if ( r.null() ){ return nullptr; }
         return ptr_t<char>( buffer, r[0], r[0]+r[2] );
     }
 
@@ -423,9 +423,9 @@ public:
 
     string_t slice( long start ) const noexcept {
 
-        auto r = get_slice_range( start, size() );
+        auto r = get_slice_range( start, (long)size() );
         if ( r.null() ){ return nullptr; }
-        
+
         auto   n_buffer = string_t( buffer.data()+r[0], r[2] );
         return n_buffer;
 
@@ -467,30 +467,30 @@ public:
         auto out=string::buffer( size() );
         auto y=out.begin(); auto x=begin();
         while( x != end() ){
-           if( string::is_alpha(*x) && b==1 ){ *y=string::to_upper(*x); b=0; goto DONE; }
-           if(!string::is_alpha(*x) ){ b =1;}  *y=string::to_lower(*x);
+           if( string::is_alpha((uchar)*x) && b==1 ){ *y=string::to_upper((uchar)*x); b=0; goto DONE; }
+           if(!string::is_alpha((uchar)*x) ){ b =1;}  *y=string::to_lower((uchar)*x);
         DONE:; ++x; ++y; } return out;
     }
 
-    string_t to_slugify() const noexcept { if( empty() ){ return nullptr; } 
+    string_t to_slugify() const noexcept { if( empty() ){ return nullptr; }
         auto out=string::buffer( size() ); ulong z=1; /*------*/
-        auto y=out.begin(); auto x=begin(); while( x != end() ){ 
-              if (!string::is_alnum(*x) ){ goto DONE; }
-            else { *y = string::to_lower(*x); ++z; }
+        auto y=out.begin(); auto x=begin(); while( x != end() ){
+        if (!string::is_alnum((uchar)*x) ){ goto DONE; }
+        else { *y = string::to_lower((uchar)*x); ++z; }
         DONE:; ++x; ++y; } return string_t( &out,z );
     }
 
-    string_t to_lower_case() const noexcept { if( empty() ){ return nullptr; } 
+    string_t to_lower_case() const noexcept { if( empty() ){ return nullptr; }
         auto out=string::buffer( size() ); /*-----------------*/
-        auto y=out.begin(); auto x=begin(); while( x != end() ){ 
-            *y=string::to_lower(*x); 
+        auto y=out.begin(); auto x=begin(); while( x != end() ){
+            *y=string::to_lower((uchar)*x);
         ++x; ++y; } return out;
     }
 
-    string_t to_upper_case() const noexcept { if ( empty() ){ return nullptr; } 
+    string_t to_upper_case() const noexcept { if ( empty() ){ return nullptr; }
         auto out=string::buffer( size() ); /*-----------------*/
-        auto y=out.begin(); auto x=begin(); while( x != end() ){ 
-            *y=string::to_upper(*x); 
+        auto y=out.begin(); auto x=begin(); while( x != end() ){
+            *y=string::to_upper((uchar)*x);
         ++x; ++y; } return out;
     }
 
@@ -498,7 +498,7 @@ public:
 
     explicit operator char* (void) const noexcept { return empty() ? nullptr : &buffer; }
     explicit operator bool  (void) const noexcept { return empty(); }
-    
+
           char*  data() const noexcept { return empty() ? nullptr : &buffer; }
           char*   get() const noexcept { return empty() ? nullptr : &buffer; }
     const char* c_str() const noexcept { return empty() ? nullptr : &buffer; }

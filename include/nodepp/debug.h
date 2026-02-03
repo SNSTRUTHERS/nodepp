@@ -14,39 +14,47 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { class debug_t {     
-protected: 
+#include "console.h"
+#include "ptr.h"
+#include "signal.h"
+#include "string.h"
+#include "task.h"
 
-    struct NODE { 
+/*────────────────────────────────────────────────────────────────────────────*/
+
+namespace nodepp { class debug_t {
+protected:
+
+    struct NODE {
         string_t     msg;
         ptr_t<task_t> ev;
     };  ptr_t<NODE>  obj;
 
 public: debug_t() noexcept : obj(new NODE()) { }
-    
+
     /*─······································································─*/
 
-   ~debug_t() noexcept { 
-        if ( obj.count() == 2 ){ 
-	         console::log( obj->msg, "closed" );  
-        }    process::onSIGERR.off( obj->ev );
+   ~debug_t() noexcept {
+        if ( obj.count() == 2 ){
+	        console::log( obj->msg, "closed" );
+        }   process::onSIGERROR.off( obj->ev );
     }
-    
+
     /*─······································································─*/
-    
+
     debug_t( const string_t& msg ) noexcept : obj(new NODE()) {
         obj->msg = msg; auto inp = type::bind( this );
-        obj->ev  = process::onSIGERR([=](){ inp->error(); });
+        obj->ev  = process::onSIGERROR([=](){ inp->error(); });
 	               console::log( obj->msg, "open" );
     }
-    
+
     /*─······································································─*/
 
     template< class... T >
     void log( const T&... args ) const noexcept { console::log( "--", args... ); }
 
     void error() const noexcept { console::error( obj->msg ); }
-    
+
 };}
 
 /*────────────────────────────────────────────────────────────────────────────*/

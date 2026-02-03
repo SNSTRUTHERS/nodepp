@@ -14,7 +14,7 @@
 
 #include "any.h"
 
-namespace nodepp { 
+namespace nodepp {
 template< class T > class optional_t {
 protected:
 
@@ -35,7 +35,7 @@ public:
     T value() const { if ( !has_value() || !data.has_value() ) {
         throw  except_t("Optional does not have a value");
     }   return data.as<T>(); }
-    
+
 };}
 
 #endif

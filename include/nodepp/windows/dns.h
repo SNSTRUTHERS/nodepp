@@ -25,20 +25,20 @@ namespace nodepp::dns {
 
     inline bool is_ipv4( const string_t& URL ){
         thread_local static regex_t reg ( "([0-9]+\\.)+[0-9]+" );
-        reg.clear_memory(); return reg.test( URL ) ? 1 : 0; 
+        reg.clear_memory(); return reg.test( URL ) ? 1 : 0;
     }
 
-    inline bool is_ipv6( const string_t& URL ){ 
+    inline bool is_ipv6( const string_t& URL ){
         thread_local static regex_t reg ( "([0-9a-fA-F]+\\:)+[0-9a-fA-F]+" );
-        reg.clear_memory(); return reg.test( URL ) ? 1 : 0; 
+        reg.clear_memory(); return reg.test( URL ) ? 1 : 0;
     }
-    
+
     /*─······································································─*/
 
     inline string_t lookup_ipv6( string_t host ) { _socket_::start_device();
 
-        if  ( host == "broadcast" || host == "::2" ){ return "::2"; } 
-        elif( host == "localhost" || host == "::1" ){ return "::1"; } 
+        if  ( host == "broadcast" || host == "::2" ){ return "::2"; }
+        elif( host == "localhost" || host == "::1" ){ return "::1"; }
         elif( host == "global"    || host == "::0" ){ return "::0"; }
         elif( host == "loopback"  || host == "::3" ){ return "::3"; }
 
@@ -53,7 +53,7 @@ namespace nodepp::dns {
           { return nullptr; }
 
         char ipstr[INET6_ADDRSTRLEN]; string_t ipAddress;
-        while ( res != nullptr ) { void *addr = nullptr; 
+        while ( res != nullptr ) { void *addr = nullptr;
             if( res->ai_family == AF_INET6 ) {
                 struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)res->ai_addr;
                 addr = &(ipv6->sin6_addr);
@@ -64,13 +64,13 @@ namespace nodepp::dns {
 
         freeaddrinfo(res); return ipAddress;
     }
-    
+
     /*─······································································─*/
 
     inline string_t lookup_ipv4( string_t host ) { _socket_::start_device();
 
-        if  ( host == "255.255.255.255" || host == "broadcast" ){ return "255.255.255.255"; } 
-        elif( host == "127.0.0.1"       || host == "localhost" ){ return "127.0.0.1"; } 
+        if  ( host == "255.255.255.255" || host == "broadcast" ){ return "255.255.255.255"; }
+        elif( host == "127.0.0.1"       || host == "localhost" ){ return "127.0.0.1"; }
         elif( host == "0.0.0.0"         || host == "global"    ){ return "0.0.0.0"; }
         elif( host == "1.1.1.1"         || host == "loopback"  ){ return "1.1.1.1"; }
 
@@ -85,7 +85,7 @@ namespace nodepp::dns {
           { return nullptr; }
 
         char ipstr[INET_ADDRSTRLEN]; string_t ipAddress;
-        while ( res != nullptr ) { void *addr = nullptr; 
+        while ( res != nullptr ) { void *addr = nullptr;
             if( res->ai_family == AF_INET ) {
                 struct sockaddr_in *ipv4 = (struct sockaddr_in *)res->ai_addr;
                 addr = &(ipv4->sin_addr);
@@ -96,16 +96,16 @@ namespace nodepp::dns {
 
         freeaddrinfo(res); return ipAddress;
     }
-    
+
     /*─······································································─*/
 
     inline string_t lookup( string_t host ) { return lookup_ipv4( host ); }
-    
+
     /*─······································································─*/
 
     inline string_t get_hostname(){
         auto socket = socket_t();
-            
+
         socket.SOCK    = SOCK_DGRAM;
         socket.IPPROTO = IPPROTO_UDP;
         socket.socket ( "loopback", 0 );

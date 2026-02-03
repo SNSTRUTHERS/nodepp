@@ -29,7 +29,7 @@
 namespace nodepp { class popen_t : public generator_t {
 protected:
 
-    void kill() const noexcept { 
+    void kill() const noexcept {
     if( obj->fd != -1 ){
         ::kill( obj->fd, SIGKILL );
     }   obj->state |= STATE::FS_STATE_KILL; }
@@ -72,8 +72,8 @@ protected:
 
         int fda[2]; if( ::pipe( fda )==-1 ){ throw except_t( "while piping stdin"  ); }
         int fdb[2]; if( ::pipe( fdb )==-1 ){ throw except_t( "while piping stdout" ); }
-        int fdc[2]; if( ::pipe( fdc )==-1 ){ throw except_t( "while piping stderr" ); } 
-        
+        int fdc[2]; if( ::pipe( fdc )==-1 ){ throw except_t( "while piping stderr" ); }
+
         obj->fd = ::fork();
 
         if( obj->fd == 0 ){
@@ -115,13 +115,13 @@ public:
         for( auto x : envs ) { env.push( x.get() ); } _init_( path, arg, env );
     }
 
-    popen_t( const string_t& path ) 
+    popen_t( const string_t& path )
     : obj( new NODE() ) { if( path.empty() ){ throw except_t("invalid command"); }
         array_t<const char*> arg; array_t<const char*> env; auto cmd = regex::match_all( path, "[^ ]+" );
         for( auto x: cmd ){ arg.push( x.get() ); } _init_( cmd[0], arg, env ); /*----------------------*/
     }
 
-    popen_t( const string_t& path, const initializer_t<string_t>& args ) : obj( new NODE() ) { 
+    popen_t( const string_t& path, const initializer_t<string_t>& args ) : obj( new NODE() ) {
         if ( path.empty() ){ throw except_t("invalid command"); }
         array_t<const char*> arg; array_t<const char*> env;
         for( auto x : args ) { arg.push( x.get() ); }
@@ -137,7 +137,7 @@ public:
     void free() const noexcept {
 
         if( is_state( STATE::FS_STATE_REUSE ) && obj.count()>1 ){ return; }
-        if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; } 
+        if( is_state( STATE::FS_STATE_KILL  ) ) /*-----------*/ { return; }
         if(!is_state( STATE::FS_STATE_CLOSE | STATE::FS_STATE_REUSE ) )
           { kill(); onDrain.emit(); } else { kill(); }
 
@@ -146,7 +146,7 @@ public:
         obj->std_input.close();
     */
 
-        onResume.clear(); onError.clear(); 
+        onResume.clear(); onError.clear();
         onDerr  .clear(); onOpen .clear();
         onData  .clear(); onDout .clear(); onClose.emit();
 
@@ -158,20 +158,20 @@ public:
         if( is_closed() ){ free(); int c = 0;
         if( ::waitpid( obj->fd, &c, WNOHANG )<0 )
           { /*unused*/ } return -1; }
-    coBegin ; onOpen.emit(); 
-    
-        coYield(1); coDelay( 100 );  do { 
+    coBegin ; onOpen.emit();
+
+        coYield(1); coDelay( 100 );  do {
         if((*_read1)(&std_output())==1) { coGoto(2); }
         if(  _read1->state <= 0 )       { coGoto(2); }
         onData.emit(_read1->data);
-        onDout.emit(_read1->data); coNext; } while(1);      
-        
+        onDout.emit(_read1->data); coNext; } while(1);
+
         coYield(2); coDelay( 100 );  do {
         if((*_read2)(&std_error())==1 ) { coGoto(1); }
         if(  _read2->state <= 0 )       { coGoto(1); }
         onData.emit(_read2->data);
         onDerr.emit(_read2->data); coNext; } while(1);
-        
+
     coGoto(1); coFinish
     }
 
@@ -180,7 +180,7 @@ public:
     bool is_alive() const noexcept {
         if( ::kill( obj->fd , 0 ) == -1 ){ return false; }
         if( std_error ().is_available() ){ return true;  }
-        if( std_output().is_available() ){ return true;  } return false; 
+        if( std_output().is_available() ){ return true;  } return false;
     }
 
     /*─······································································─*/
@@ -199,7 +199,7 @@ public:
 
     void close() const noexcept {
         if( is_state ( STATE::FS_STATE_DISABLE ) ){ return; }
-            set_state( STATE::FS_STATE_CLOSE   ); DONE:;
+            set_state( STATE::FS_STATE_CLOSE   );
     onDrain.emit(); free(); }
 
     /*─······································································─*/

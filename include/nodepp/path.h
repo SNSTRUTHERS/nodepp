@@ -157,9 +157,9 @@ namespace nodepp::path {
 
     /*─······································································─*/
 
-    inline bool is_absolute( const string_t& path ){ 
+    inline bool is_absolute( const string_t& path ){
         static regex_t reg3 = regex_t( PATH_PEG );
-        return reg3.test(path); 
+        return reg3.test(path);
     }
 
     /*─······································································─*/

@@ -41,10 +41,10 @@ namespace nodepp::process::env {
             auto match = reg.get_memory  ();
             /*--------*/ reg.clear_memory();
 
-            if ( match.size() != 2 ){ continue; } 
+            if ( match.size() != 2 ){ continue; }
             set( match[0], match[1] );
         }
-        
+
     } catch(...) { return -1; } return 1; }
 
 }
@@ -61,7 +61,7 @@ namespace nodepp::process {
 
     inline string_t  home(){ return  env::get("HOME");  }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

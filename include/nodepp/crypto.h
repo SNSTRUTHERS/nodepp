@@ -61,15 +61,15 @@ protected:
         bool state = 0;
     };  ptr_t<NODE> obj;
 
-    string_t hex() const noexcept { 
-        free(); return { (char*) &obj->bff, obj->length }; 
+    string_t hex() const noexcept {
+        free(); return { (char*) &obj->bff, obj->length };
     }
 
 public:
 
     template< class T >
-    hash_t( const T& type, ulong length ) : obj( new NODE() ) { 
-         
+    hash_t( const T& type, ulong length ) : obj( new NODE() ) {
+
         obj->bff   = ptr_t<uchar>( length );
         obj->ctx   = EVP_MD_CTX_new();
         obj->state = 1;
@@ -81,29 +81,29 @@ public:
 
     EVP_MD_CTX* get_fd() const noexcept { return obj->ctx; }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, base=(ulong)( obj->bff.size() );
-        while( chunk < msg.size() ){ 
-            string_t tmp = msg.slice( chunk, chunk + base );
+        while( chunk < msg.size() ){
+            string_t tmp = msg.slice( long(chunk), long(chunk + base) );
             EVP_DigestUpdate( obj->ctx, (uchar*) tmp.data(), tmp.size() );
         chunk += base; }
     }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state = 0;
         EVP_DigestFinal_ex( obj->ctx, &obj->bff, &obj->length );
-        EVP_MD_CTX_free( obj->ctx ); 
+        EVP_MD_CTX_free( obj->ctx );
     }
 
     bool is_available() const noexcept { return obj->state == 1; }
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    string_t get() const noexcept { 
+    string_t get() const noexcept {
         return encoder::buffer::buff2hex( this->hex() );
     }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -114,46 +114,46 @@ protected:
 
     struct NODE {
         HMAC_CTX* ctx = nullptr;
-        ptr_t<uchar> bff; 
+        ptr_t<uchar> bff;
         uint length= 0;
         bool state = 0;
     };  ptr_t<NODE> obj;
 
-    string_t hex() const noexcept { 
-        free(); return { (char*) &obj->bff, obj->length }; 
+    string_t hex() const noexcept {
+        free(); return { (char*) &obj->bff, obj->length };
     }
 
 public:
 
     template< class T >
-    hmac_t( const string_t& key, const T& type, ulong length ) 
+    hmac_t( const string_t& key, const T& type, ulong length )
     :  obj( new NODE() ) { if( key.empty() ){ return; }
-        obj->bff   = ptr_t<uchar>( length ); 
-        obj->ctx   = HMAC_CTX_new(); 
+        obj->bff   = ptr_t<uchar>( length );
+        obj->ctx   = HMAC_CTX_new();
         obj->state = 1;
-        if ( !obj->ctx || !HMAC_Init_ex( obj->ctx, key.data(), key.size(), type, nullptr ) )
+        if ( !obj->ctx || !HMAC_Init_ex( obj->ctx, key.data(), int(key.size()), type, nullptr ) )
            { throw except_t("can't initializate hmac_t"); }
     }
-    
+
    ~hmac_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
     HMAC_CTX* get_fd() const noexcept { return obj->ctx; }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, base=(ulong)( obj->bff.size() );
-        while( chunk < msg.size() ){ 
-            string_t tmp = msg.slice( chunk, chunk + base );
+        while( chunk < msg.size() ){
+            string_t tmp = msg.slice( (long)chunk, long(chunk + base) );
             HMAC_Update( obj->ctx, (uchar*) tmp.data(), tmp.size() );
         chunk += base; }
     }
 
     void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state = 0;
-        HMAC_Final( obj->ctx, &obj->bff, &obj->length ); 
-        HMAC_CTX_free( obj->ctx ); 
+        HMAC_Final( obj->ctx, &obj->bff, &obj->length );
+        HMAC_CTX_free( obj->ctx );
     }
 
-    string_t get() const noexcept { 
+    string_t get() const noexcept {
         return encoder::buffer::buff2hex( this->hex() );
     }
 
@@ -161,7 +161,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -196,14 +196,14 @@ public:
     }
 
     xor_t() noexcept : obj( new NODE() ) { obj->state = 0; }
-    
+
    ~xor_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, /*-------------*/ base=CHUNK_SIZE;
-        while( chunk < msg.size() ){ string_t tmp = msg.slice( chunk, chunk + base );
-            forEach( y, obj->ctx ){ forEach( x, tmp ){ 
-                x = x ^ y.key[ y.pos % y.key.size() ]; ++y.pos; 
+        while( chunk < msg.size() ){ string_t tmp = msg.slice( long(chunk), long(chunk + base) );
+            forEach( y, obj->ctx ){ forEach( x, tmp ){
+                x = x ^ y.key[ y.pos % y.key.size() ]; ++y.pos;
             }} if ( tmp.empty() )     { return; }
              elif ( onData.empty() )  { obj->bff +=tmp; }
              else { onData.emit(tmp); }
@@ -216,13 +216,13 @@ public:
 
     string_t get() const noexcept { free(); return obj->bff; }
 
-    void free() const noexcept { 
-        if ( obj->state == 0 ){ return; } 
-             obj->state = 0; onClose.emit(); 
+    void free() const noexcept {
+        if ( obj->state == 0 ){ return; }
+             obj->state = 0; onClose.emit();
              onData.clear();
     }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -263,29 +263,29 @@ public:
            { throw except_t("can't initializate encrypt_t"); }
     }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, base=(ulong)( obj->bff.size() );
-        while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
-            EVP_EncryptUpdate( obj->ctx, &obj->bff, &obj->len, (uchar*)tmp.get(), tmp.size() );
+        while( chunk < msg.size() ){ auto tmp = msg.slice( long(chunk), long(chunk + base) );
+            EVP_EncryptUpdate( obj->ctx, &obj->bff, &obj->len, (uchar*)tmp.get(), int(tmp.size()) );
             if ( obj->len > 0 ) { if ( onData.empty() ) {
                      obj->buff += string_t( (char*)&obj->bff, (ulong) obj->len );
             } else { onData.emit( string_t( (char*)&obj->bff, (ulong) obj->len ) ); }}
         chunk += base; }
     }
-    
+
    ~encrypt_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
     EVP_CIPHER_CTX* get_fd() const noexcept { return obj->ctx; }
 
     string_t get() const noexcept { free(); return obj->buff; }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state = 0;
         EVP_EncryptFinal( obj->ctx, &obj->bff, &obj->len );
-        EVP_CIPHER_CTX_free( obj->ctx ); 
+        EVP_CIPHER_CTX_free( obj->ctx );
         if ( obj->len > 0 ) { if ( onData.empty() ) {
                  obj->buff += string_t( (char*)&obj->bff, (ulong) obj->len );
-        } else { onData.emit( string_t( (char*)&obj->bff, (ulong) obj->len ) ); 
+        } else { onData.emit( string_t( (char*)&obj->bff, (ulong) obj->len ) );
         } onClose.emit(); } onData.clear();
     }
 
@@ -293,7 +293,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -303,13 +303,13 @@ class decrypt_t {
 protected:
 
     struct NODE {
-        EVP_CIPHER_CTX* ctx = nullptr; 
+        EVP_CIPHER_CTX* ctx = nullptr;
         ptr_t<uchar> bff;
         string_t buff;
-        bool state =0; 
+        bool state =0;
         int    len =0;
     };  ptr_t<NODE> obj;
-    
+
 public:
 
     event_t<string_t> onData;
@@ -334,29 +334,29 @@ public:
            { throw except_t("can't initializate decrypt_t"); }
     }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, base=(ulong)( obj->bff.size() );
-        while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
-            EVP_DecryptUpdate( obj->ctx, &obj->bff, &obj->len, (uchar*)tmp.get(), tmp.size());
+        while( chunk < msg.size() ){ auto tmp = msg.slice( long(chunk), long(chunk + base) );
+            EVP_DecryptUpdate( obj->ctx, &obj->bff, &obj->len, (uchar*)tmp.get(), int(tmp.size()));
             if ( obj->len > 0 ) { if ( onData.empty() ) {
                      obj->buff += string_t( (char*)&obj->bff, (ulong) obj->len );
             } else { onData.emit( string_t( (char*)&obj->bff, (ulong) obj->len ) ); }}
         chunk += base; }
     }
-    
+
    ~decrypt_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
     EVP_CIPHER_CTX* get_fd() const noexcept { return obj->ctx; }
 
     string_t get() const noexcept { free(); return obj->buff; }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state = 0;
-        EVP_DecryptFinal( obj->ctx, &obj->bff, &obj->len ); 
-        EVP_CIPHER_CTX_free( obj->ctx ); 
+        EVP_DecryptFinal( obj->ctx, &obj->bff, &obj->len );
+        EVP_CIPHER_CTX_free( obj->ctx );
         if ( obj->len > 0 ) { if ( onData.empty() ) {
                  obj->buff += string_t( (char*)&obj->bff, (ulong) obj->len );
-        } else { onData.emit( string_t( (char*)&obj->bff, (ulong) obj->len ) ); 
+        } else { onData.emit( string_t( (char*)&obj->bff, (ulong) obj->len ) );
         } onClose.emit(); } onData.clear();
     }
 
@@ -364,7 +364,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -382,10 +382,10 @@ protected:
     string_t encode( string_t msg ) const noexcept {
         if( msg.empty() ){ return nullptr; }
 
-        BN_zero(obj->bn); BN_bin2bn((uchar*)msg.data(), msg.size(), obj->bn);
+        BN_zero(obj->bn); BN_bin2bn((uchar*)msg.data(), int(msg.size()), obj->bn);
 
         string_t result; while(!BN_is_zero(obj->bn)) {
-            int rem = BN_div_word(obj->bn, obj->chr.size());
+            auto rem = BN_div_word(obj->bn, obj->chr.size());
             result.unshift(obj->chr[rem]);
         }
 
@@ -403,23 +403,23 @@ public:
     event_t<string_t> onData;
     event_t<>         onClose;
 
-    encoder_t( const string_t& chr ) : obj( new NODE() ) { 
+    encoder_t( const string_t& chr ) : obj( new NODE() ) {
         obj->state = 1; obj->chr = chr; obj->bn = (BIGNUM*) BN_new();
         if( !obj->bn ){ throw except_t("can't initializate encoder"); }
     }
-    
+
    ~encoder_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
     string_t get() const noexcept { if( obj->state == 0 ){ return nullptr; }
         auto raw = array_t<string_t>( obj->bff.data() ).join(nullptr);
-        auto data= encode( raw ); free(); return data; 
+        auto data= encode( raw ); free(); return data;
     }
 
-    void update( const string_t& msg ) const noexcept { 
+    void update( const string_t& msg ) const noexcept {
          if( obj->state!=1 ){ return; } obj->bff.push( msg );
     }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 1 ){ return; } obj->state = 0;
         if( obj->bn != nullptr ){ BN_clear_free( obj->bn ); }
             onClose.emit(); onData.clear();
@@ -450,18 +450,18 @@ protected:
         BN_zero(obj->bn); ulong lz = 0; ulong ch = true;
 
         for ( const auto& c : msg ){
-        if  ( ch && c == obj->chr[0] ){ lz++; } 
+        if  ( ch && c == obj->chr[0] ){ lz++; }
         else{ ch = false; }
 
             const char* pos = strchr(obj->chr.data(), c);
             if( pos == nullptr ){ return nullptr; }
-            
+
             BN_mul_word(obj->bn, obj->chr.size());
-            BN_add_word(obj->bn, pos- obj->chr.data());
+            BN_add_word(obj->bn, (ulong)(pos - obj->chr.data()));
         }
 
-        int num_bytes = BN_num_bytes(obj->bn); 
-        ptr_t<uchar> tmp ( lz + num_bytes, '\0' );
+        int num_bytes = BN_num_bytes(obj->bn);
+        ptr_t<uchar> tmp ( lz + (ulong)num_bytes, '\0' );
         BN_bn2bin( obj->bn, tmp.data() + lz );
 
         string_t out( (char*)tmp.data(),tmp.size() );
@@ -474,23 +474,23 @@ public:
     event_t<string_t> onData;
     event_t<>         onClose;
 
-    decoder_t( const string_t& chr ) : obj( new NODE() ) { 
+    decoder_t( const string_t& chr ) : obj( new NODE() ) {
         obj->state = 1; obj->chr = chr; obj->bn = (BIGNUM*) BN_new();
         if( !obj->bn ){ throw except_t("can't initializate decoder"); }
     }
-    
+
    ~decoder_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
-    void update( const string_t& msg ) const noexcept { 
+    void update( const string_t& msg ) const noexcept {
          if( obj->state!=1 ){ return; } obj->bff.push( msg );
     }
 
     string_t get() const noexcept { if( obj->state == 0 ){ return nullptr; }
         auto raw = array_t<string_t>( obj->bff.data() ).join(nullptr);
-        auto data= decode( raw ); free(); return data; 
+        auto data= decode( raw ); free(); return data;
     }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 1 ){ return; } obj->state = 0;
         if( obj->bn != nullptr ){ BN_clear_free( obj->bn ); }
             onClose.emit(); onData.clear();
@@ -500,7 +500,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -533,20 +533,20 @@ public:
         obj->state = 1; obj->bff = ptr_t<char>( CHUNK_SIZE, '\0' );
 
         CTX item1; memset( &item1, 0, sizeof(CTX) );
-            item1.pos1 = 0; item1.pos2 =-6; 
+            item1.pos1 = 0; item1.pos2 =-6;
             item1.size = 0; item1.len  = 0;
 
         obj->ctx = type::bind( item1 );
     }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, /*--------*/ base=obj->bff.size();
-        while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
+        while( chunk < msg.size() ){ auto tmp = msg.slice( long(chunk), long(chunk + base) );
             string_t out; obj->ctx->len = 0; forEach ( x, tmp ) {
 
                 obj->ctx->pos1 = ( obj->ctx->pos1 << 8 ) + x; obj->ctx->pos2 += 8;
 
-                while ( obj->ctx->pos2 >= 0 ) { 
+                while ( obj->ctx->pos2 >= 0 ) {
                     obj->bff[obj->ctx->len] = CRYPTO_BASE64[(obj->ctx->pos1>>obj->ctx->pos2)&0x3F];
                     obj->ctx->pos2 -= 6; ++obj->ctx->len;
                 }
@@ -558,16 +558,16 @@ public:
         chunk += base; }
     }
 
-    void free() const noexcept { if ( obj->state == 0 ){ return; } 
+    void free() const noexcept { if ( obj->state == 0 ){ return; }
         string_t out; obj->state = 0; obj->ctx->len = 0;
 
-        if( obj->ctx->pos2 > -6 ){ 
+        if( obj->ctx->pos2 > -6 ){
             obj->bff[obj->ctx->len] = CRYPTO_BASE64[((obj->ctx->pos1<<8)>>(obj->ctx->pos2+8))&0x3F];
-            obj->ctx->len++; 
-        } while ( ( obj->ctx->len + obj->ctx->size ) % 4 ){ 
-            obj->bff[obj->ctx->len] = '='; 
             obj->ctx->len++;
-        } 
+        } while ( ( obj->ctx->len + obj->ctx->size ) % 4 ){
+            obj->bff[obj->ctx->len] = '=';
+            obj->ctx->len++;
+        }
 
         obj->ctx->size += obj->ctx->len; out = string_t( &obj->bff, obj->ctx->len );
         if ( onData.empty() ) { obj->buff.push( out ); } else { onData.emit(out); }
@@ -580,7 +580,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -614,15 +614,15 @@ public:
         obj->state = 1; obj->bff = ptr_t<char>( CHUNK_SIZE, '\0' );
 
         CTX item1; memset( &item1, 0, sizeof(CTX) );
-            item1.pos1 = 0; item1.pos2 =-8; 
+            item1.pos1 = 0; item1.pos2 =-8;
             item1.size = 0; item1.len  = 0;
 
         obj->ctx = type::bind( item1 );
     }
 
-    void update( string_t msg ) const noexcept { 
+    void update( string_t msg ) const noexcept {
         if( obj->state != 1 ){ return; } ulong chunk=0, /*--------*/ base=obj->bff.size();
-        while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
+        while( chunk < msg.size() ){ auto tmp = msg.slice( long(chunk), long(chunk + base) );
         for  ( int x=0; x<64; x++ ){ obj->ctx->T[type::cast<int>(CRYPTO_BASE64[x])] =x; }
 
             string_t out; obj->ctx->len = 0; forEach ( x, tmp ) {
@@ -644,8 +644,8 @@ public:
         chunk += base; }
     }
 
-    void free() const noexcept { 
-    if( obj->state == 0 ){ return; } 
+    void free() const noexcept {
+    if( obj->state == 0 ){ return; }
         obj->state =  0; onClose.emit(); onData.clear();
     }
 
@@ -655,7 +655,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -675,23 +675,23 @@ protected:
 
     static int PASS_CLB ( char *buf, int size, int rwflag, void *args ) {
         if( args == nullptr || rwflag != 1 ){ return -1; }
-        strncpy( buf, (char*)args, size );
+        strncpy( buf, (char*)args, size_t(size) );
                  buf[ size - 1 ] = '\0';
-        return strlen(buf);
+        return (int)strlen(buf);
     }
 
 public:
 
     X509_t( uint rsa_size=2048 ) : obj( new NODE() ) {
-        
-        obj->ctx = X509_new(); obj->name= X509_NAME_new();  
+
+        obj->ctx = X509_new(); obj->name= X509_NAME_new();
         obj->rsa = RSA_new();  obj->num = BN_new();
         obj->pkey= EVP_PKEY_new();
-        
-        BN_set_word( obj->num, RSA_F4 );
-        RSA_generate_key_ex( obj->rsa, rsa_size, obj->num, NULL ); 
 
-        obj->state = 1; if( !obj->ctx || !obj->rsa ) 
+        BN_set_word( obj->num, RSA_F4 );
+        RSA_generate_key_ex( obj->rsa, int(rsa_size), obj->num, NULL );
+
+        obj->state = 1; if( !obj->ctx || !obj->rsa )
         { throw except_t("can't initializate X509_t"); }
 
     }
@@ -707,7 +707,7 @@ public:
     void generate( string_t _name, string_t _contry, string_t _organization, ulong _time=31536000L ) const {
 
         X509_set_version( obj->ctx, 2 ); ASN1_INTEGER_set( X509_get_serialNumber(obj->ctx), 1 );
-        
+
         X509_NAME_add_entry_by_txt( obj->name, "O",  MBSTRING_ASC, (uchar*) _organization.get(), -1, -1, 0);
         X509_NAME_add_entry_by_txt( obj->name, "C",  MBSTRING_ASC, (uchar*) _contry.get(), -1, -1, 0);
         X509_NAME_add_entry_by_txt( obj->name, "CN", MBSTRING_ASC, (uchar*) _name.get(), -1, -1, 0);
@@ -715,7 +715,7 @@ public:
 
         if( _time != 0 ){
             X509_gmtime_adj( X509_getm_notBefore(obj->ctx), 0 );
-            X509_gmtime_adj( X509_getm_notAfter(obj->ctx), _time );
+            X509_gmtime_adj( X509_getm_notAfter(obj->ctx), long(_time) );
         }
 
         EVP_PKEY_assign_RSA( obj->pkey, obj->rsa ); X509_set_pubkey( obj->ctx, obj->pkey );
@@ -728,7 +728,7 @@ public:
     string_t write_private_key_to_memory( const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
         PEM_write_bio_RSAPrivateKey( bo, obj->rsa, NULL, NULL, 0, &PASS_CLB, (void*)pass );
-        long len = BIO_get_mem_data( bo, &data ); string_t res ( data, len );
+        long len = BIO_get_mem_data( bo, &data ); string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
 
@@ -736,7 +736,7 @@ public:
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
         PEM_write_bio_X509( bo, obj->ctx );
         long len = BIO_get_mem_data( bo, &data );
-        string_t res ( data, len );
+        string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
 
@@ -748,8 +748,8 @@ public:
         file_t fp( path, "w" ); fp.write( write_certificate_to_memory() );
     }
 
-    void free() const noexcept { 
-        if( obj->state == 0 ){ return; } obj->state = 0; 
+    void free() const noexcept {
+        if( obj->state == 0 ){ return; } obj->state = 0;
         if( obj->num != nullptr ){ BN_free( obj->num ); }
         if( obj->ctx != nullptr ){ X509_free( obj->ctx ); }
         if( obj->pkey!= nullptr ){ EVP_PKEY_free( obj->pkey ); }
@@ -772,11 +772,11 @@ protected:
 
     static int PASS_CLB ( char *buf, int size, int rwflag, void *args ) {
         if( args == nullptr || rwflag != 1 ){ return -1; }
-        strncpy( buf, (char*)args, size );
+        strncpy( buf, (char*)args, size_t(size) );
                 buf[ size - 1 ] = '\0';
-        return strlen(buf);
+        return (int)strlen(buf);
     }
-    
+
 public:
 
     rsa_t() : obj( new NODE() ) {
@@ -790,29 +790,29 @@ public:
 
     int generate_keys( uint len=2048 ) const noexcept {
         len = clamp( len, 1024u, 4098u ); BN_set_word( obj->num, RSA_F4 );
-        int c = RSA_generate_key_ex( obj->rsa, len, obj->num, NULL );
-        obj->bff.resize( RSA_size(obj->rsa) ); return c;
+        int c = RSA_generate_key_ex( obj->rsa, int(len), obj->num, NULL );
+        obj->bff.resize( (ulong)RSA_size(obj->rsa) ); return c;
     }
 
     void read_private_key_from_memory( const string_t& key, const char* pass=NULL ) const {
-        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), key.size() );
+        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
         if( !PEM_read_bio_RSAPrivateKey( bo, &obj->rsa, &PASS_CLB, (void*)pass ) ){
             BIO_free(bo); throw except_t( "Invalid RSA Key" );
-        }   BIO_free(bo); obj->bff.resize(RSA_size(obj->rsa));
+        }   BIO_free(bo); obj->bff.resize((ulong)RSA_size(obj->rsa));
     }
 
     void read_public_key_from_memory( const string_t& key, const char* pass=NULL ) const {
-        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), key.size() );
+        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
         if( !PEM_read_bio_RSAPublicKey( bo, &obj->rsa, &PASS_CLB, (void*)pass ) ){
             BIO_free(bo); throw except_t( "Invalid RSA Key" );
-        }   BIO_free(bo); obj->bff.resize(RSA_size(obj->rsa));
+        }   BIO_free(bo); obj->bff.resize((ulong)RSA_size(obj->rsa));
     }
 
     string_t write_private_key_to_memory( const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
         PEM_write_bio_RSAPrivateKey( bo, obj->rsa, NULL, NULL, 0, &PASS_CLB, (void*)pass );
         long len = BIO_get_mem_data( bo, &data );
-        string_t res ( data, len );
+        string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
 
@@ -820,7 +820,7 @@ public:
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
         PEM_write_bio_RSAPublicKey( bo, obj->rsa );
         long len = BIO_get_mem_data( bo, &data );
-        string_t res ( data, len );
+        string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
 
@@ -829,7 +829,7 @@ public:
     }
 
     int write_private_key( const string_t& path, const char* pass=NULL ) const {
-        file_t fp( path, "w" ); return fp.write( write_private_key_to_memory( pass ) );
+        file_t fp( path, "w" ); return (int)fp.write( write_private_key_to_memory( pass ) );
     }
 
     void read_public_key( const string_t& path, const char* pass=NULL ) const {
@@ -837,16 +837,16 @@ public:
     }
 
     int write_public_key( const string_t& path ) const {
-        file_t fp( path, "w" ); return fp.write( write_public_key_to_memory() );
+        file_t fp( path, "w" ); return (int)fp.write( write_public_key_to_memory() );
     }
 
     string_t public_encrypt( string_t msg, int padding=RSA_PKCS1_PADDING ) const {
         if( msg.empty() || obj->state==0 || obj->rsa == nullptr ){ return nullptr; }
 
         ulong chunk=0, base=(ulong)( obj->bff.size() ); string_t data;
-        
-        while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
-            int c = RSA_public_encrypt( tmp.size(), (uchar*)tmp.data(), &obj->bff, obj->rsa, padding );
+
+        while( chunk < msg.size() ){ auto tmp = msg.slice( long(chunk), long(chunk + base) );
+            int c = RSA_public_encrypt( (int)tmp.size(), (uchar*)tmp.data(), &obj->bff, obj->rsa, padding );
             data += string_t( (char*) &obj->bff, (ulong)c );
         chunk += base; } return data;
     }
@@ -856,7 +856,7 @@ public:
         if( msg.empty() || obj->state==0 || obj->rsa == nullptr ){ return nullptr; }
 
         ulong chunk=0, base=(ulong)( obj->bff.size() ); string_t data;
-        
+
         while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
             int c = RSA_private_encrypt( tmp.size(), (uchar*)tmp.data(), &obj->bff, obj->rsa, padding );
             data += string_t( (char*) &obj->bff, (ulong)c );
@@ -867,7 +867,7 @@ public:
         if( msg.empty() || obj->state==0 || obj->rsa == nullptr ){ return nullptr; }
 
         ulong chunk=0, base=(ulong)( obj->bff.size() ); string_t data;
-        
+
         while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
             int c = RSA_public_decrypt( tmp.size(), (uchar*)tmp.data(), &obj->bff, obj->rsa, padding );
             data += string_t( (char*) &obj->bff, (ulong)c );
@@ -879,9 +879,9 @@ public:
         if( msg.empty() || obj->state==0 || obj->rsa == nullptr ){ return nullptr; }
 
         ulong chunk=0, base=(ulong)( obj->bff.size() ); string_t data;
-        
-        while( chunk < msg.size() ){ auto tmp = msg.slice( chunk, chunk + base );
-            int c = RSA_private_decrypt( tmp.size(), (uchar*)tmp.data(), &obj->bff, obj->rsa, padding );
+
+        while( chunk < msg.size() ){ auto tmp = msg.slice( long(chunk), long(chunk + base) );
+            int c = RSA_private_decrypt( (int)tmp.size(), (uchar*)tmp.data(), &obj->bff, obj->rsa, padding );
             data += string_t( (char*) &obj->bff, (ulong)c );
         chunk += base; } return data;
     }
@@ -890,14 +890,14 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state =0;
         if( obj->num != nullptr ){ BN_free( obj->num ); }
         if( obj->rsa != nullptr ){ RSA_free( obj->rsa ); }
     }
-    
+
 };
 
 /*────────────────────────────────────────────────────────────────────────────*/
@@ -912,19 +912,19 @@ protected:
         EC_KEY   *key_pair  = nullptr;
         bool      state = 0;
     };  ptr_t<NODE> obj;
-    
+
 public:
 
     template< class T >
     ec_t( const string_t& key, const T& type ) noexcept :obj( new NODE() ) {
-        
+
         if( key.empty() ){ return; }
         obj->state = 1;
 
         obj->key_pair  = EC_KEY_new_by_curve_name(type);
         obj->key_group = EC_GROUP_new_by_curve_name(type);
 
-        obj->priv_key = (BIGNUM*) BN_new(); 
+        obj->priv_key = (BIGNUM*) BN_new();
         BN_hex2bn( &obj->priv_key, key.data() );
         EC_KEY_set_private_key( obj->key_pair, obj->priv_key );
 
@@ -934,7 +934,7 @@ public:
     }
 
     template< class T >
-    ec_t( const T& type ) noexcept : obj( new NODE() ) { 
+    ec_t( const T& type ) noexcept : obj( new NODE() ) {
         obj->state = 1;
 
         obj->key_pair  = EC_KEY_new();
@@ -946,10 +946,10 @@ public:
         obj->pub_key  = (EC_POINT*) EC_KEY_get0_public_key( obj->key_pair );
         obj->priv_key = (BIGNUM*)  EC_KEY_get0_private_key( obj->key_pair );
     }
-    
+
    ~ec_t() noexcept { if( obj.count()>1 ){ return; } free(); }
 
-    string_t get_public_key( uint x = 0 ) const noexcept { 
+    string_t get_public_key( uint x = 0 ) const noexcept {
         if( obj->state != 1 ){ return nullptr; }
         point_conversion_form_t y; switch( x ){
             case 0:  y = POINT_CONVERSION_HYBRID;       break;
@@ -960,7 +960,7 @@ public:
 
     string_t get_private_key() const noexcept { return BN_bn2hex( obj->priv_key ); }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state = 0;
         if( obj->priv_key  != nullptr ){ BN_free( obj->priv_key ); }
     //  if( obj->key_pair  != nullptr ){ EC_KEY_free( obj->key_pair ); }
@@ -972,7 +972,7 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
+    void close() const noexcept { free(); }
 
 };
 
@@ -1015,12 +1015,12 @@ public:
     }
 
     string_t get_private_key() const noexcept {
-        if( obj->state != 1 ){ return nullptr; } 
+        if( obj->state != 1 ){ return nullptr; }
         return BN_bn2hex( DH_get0_priv_key( obj->dh ) );
     }
 
     string_t get_public_key() const noexcept {
-        if( obj->state != 1 ){ return nullptr; } 
+        if( obj->state != 1 ){ return nullptr; }
         return BN_bn2hex( DH_get0_pub_key( obj->dh ) );
     }
 
@@ -1035,8 +1035,8 @@ public:
     }
 
     string_t sign( const string_t& hex ) const {
-        if( obj->state != 1 ){ return nullptr; } 
-        ptr_t<uchar> shared( DH_size( obj->dh ) );
+        if( obj->state != 1 ){ return nullptr; }
+        ptr_t<uchar> shared((ulong) DH_size( obj->dh ) );
         if( !BN_hex2bn( &obj->k,hex.data() ) )
           { throw except_t( "invalid key" ); }
         int len = DH_compute_key( &shared, obj->k, obj->dh );
@@ -1054,14 +1054,14 @@ protected:
         DSA    *dsa = nullptr;
         bool    state = 0;
     };  ptr_t<NODE> obj;
-    
+
     static int PASS_CLB ( char *buf, int size, int rwflag, void *args ) {
         if( args == nullptr || rwflag != 1 ){ return -1; }
-        strncpy( buf, (char*)args, size );
+        strncpy( buf, (char*)args, size_t(size) );
                 buf[ size - 1 ] = '\0';
-        return strlen(buf);
+        return (int)strlen(buf);
     }
-    
+
 public:
 
     dsa_t(): obj( new NODE() ) { obj->state = 1; obj->dsa = DSA_new(); }
@@ -1069,31 +1069,31 @@ public:
    ~dsa_t() noexcept { if( obj.count() > 1 ){ return; } free(); }
 
     int generate_keys( uint len=512 ) const noexcept {
-        if(!DSA_generate_parameters_ex( obj->dsa, len, NULL, 0, NULL, NULL, NULL ) )
+        if(!DSA_generate_parameters_ex( obj->dsa, int(len), NULL, 0, NULL, NULL, NULL ) )
           { return -1; } if(!DSA_generate_key( obj->dsa ) )
           { return -1; } return 1;
     }
 
-    bool verify( const string_t& msg, const string_t& sgn ) const noexcept { 
-         if( obj->state != 1 || obj->dsa == nullptr ){ return false; } auto ngs = encoder::buffer::hex2buff( sgn ); 
-         return DSA_verify( 0, (uchar*)msg.data(), msg.size(), (uchar*)ngs.data(), ngs.size(), obj->dsa )>0;
+    bool verify( const string_t& msg, const string_t& sgn ) const noexcept {
+         if( obj->state != 1 || obj->dsa == nullptr ){ return false; } auto ngs = encoder::buffer::hex2buff( sgn );
+         return DSA_verify( 0, (uchar*)msg.data(), int(msg.size()), (uchar*)ngs.data(), int(ngs.size()), obj->dsa )>0;
     }
 
     string_t sign( const string_t& msg ) const noexcept {
         if( obj->state != 1 || obj->dsa == nullptr ){ return nullptr; }
-        ptr_t<uchar> sgn( DSA_size(obj->dsa) ); uint len;
-        DSA_sign( 0,(uchar*)msg.data(), msg.size(),&sgn, &len, obj->dsa );
+        ptr_t<uchar> sgn( (ulong)DSA_size(obj->dsa) ); uint len;
+        DSA_sign( 0,(uchar*)msg.data(), int(msg.size()),&sgn, &len, obj->dsa );
         return encoder::buffer::buff2hex( string_t( (char*) &sgn, (ulong) len ) );
     }
 
     void read_private_key_from_memory( const string_t& key, const char* pass=NULL ) const {
-        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), key.size() );
+        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
         if( !PEM_read_bio_DSAPrivateKey( bo, &obj->dsa, &PASS_CLB, (void*)pass ) )
           { BIO_free(bo); throw except_t( "Invalid DSA Key" ); } BIO_free(bo);
     }
 
     void read_public_key_from_memory( const string_t& key, const char* pass=NULL ) const {
-        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), key.size() );
+        BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
         if( !PEM_read_bio_DSA_PUBKEY( bo, &obj->dsa, &PASS_CLB, (void*)pass ) )
           { BIO_free(bo); throw except_t( "Invalid DSA Key" ); } BIO_free(bo);
     }
@@ -1102,7 +1102,7 @@ public:
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
         PEM_write_bio_DSAPrivateKey( bo, obj->dsa, NULL, NULL, 0, &PASS_CLB, (void*)pass );
         long len = BIO_get_mem_data( bo, &data );
-        string_t res ( data, len );
+        string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
 
@@ -1110,7 +1110,7 @@ public:
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
         PEM_write_bio_DSA_PUBKEY( bo, obj->dsa );
         long len = BIO_get_mem_data( bo, &data );
-        string_t res ( data, len );
+        string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
 
@@ -1130,7 +1130,7 @@ public:
         file_t fp( path, "w" ); fp.write( write_public_key_to_memory() );
     }
 
-    void free() const noexcept { 
+    void free() const noexcept {
         if( obj->state == 0 ){ return; } obj->state = 0;
         if( obj->dsa != nullptr ) DSA_free( obj->dsa );
     }
@@ -1139,13 +1139,13 @@ public:
 
     bool is_closed() const noexcept { return obj->state == 0; }
 
-    void close() const noexcept { free(); } 
-    
+    void close() const noexcept { free(); }
+
 };
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace crypto { namespace hash {
+namespace crypto::hash{
 
     class MD5 : public hash_t { public:
           MD5() : hash_t( EVP_md5(), MD5_DIGEST_LENGTH ) {}
@@ -1181,13 +1181,13 @@ namespace crypto { namespace hash {
 
     class RIPEMD160 : public hash_t { public:
           RIPEMD160() : hash_t( EVP_ripemd160(), RIPEMD160_DIGEST_LENGTH ) {}
-    }; 
+    };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace hmac {
+namespace crypto::hmac{
 
     class MD5 : public hmac_t { public:
           MD5 ( const string_t& key ) : hmac_t( key, EVP_md5(), MD5_DIGEST_LENGTH ) {}
@@ -1223,155 +1223,155 @@ namespace crypto { namespace hmac {
 
     class RIPEMD160 : public hmac_t { public:
           RIPEMD160( const string_t& key ) : hmac_t( key, EVP_ripemd160(), RIPEMD160_DIGEST_LENGTH ) {}
-    }; 
+    };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace encrypt {
+namespace crypto::encrypt{
 
-    class RSA : public rsa_t { public: template< class... T > 
+    class RSA : public rsa_t { public: template< class... T >
           RSA ( const T&... args ) : rsa_t( args... ) {}
     };
 
     /*─······································································─*/
-    
+
     class XOR : public xor_t { public: template< class... T >
           XOR ( const T&... args ) : xor_t( args... ) {}
     };
 
     /*─······································································─*/
-    
+
     class DES_CBC : public encrypt_t { public: template< class... T >
           DES_CBC ( const T&... args ) : encrypt_t( args..., EVP_des_ede_cbc() ) {}
     };
-    
+
     class DES_ECB : public encrypt_t { public: template< class... T >
           DES_ECB ( const T&... args ) : encrypt_t( args..., EVP_des_ede_ecb() ) {}
     };
 
     /*─······································································─*/
-    
+
     class AES_128_CBC : public encrypt_t { public: template< class... T >
           AES_128_CBC( const T&... args ) : encrypt_t( args..., EVP_aes_128_cbc() ) {}
     };
-    
+
     class AES_192_CBC : public encrypt_t { public: template< class... T >
           AES_192_CBC( const T&... args ) : encrypt_t( args..., EVP_aes_192_cbc() ) {}
     };
-    
+
     class AES_256_CBC : public encrypt_t { public: template< class... T >
           AES_256_CBC( const T&... args ) : encrypt_t( args..., EVP_aes_256_cbc() ) {}
     };
 
     /*─······································································─*/
-    
+
     class AES_128_ECB : public encrypt_t { public: template< class... T >
           AES_128_ECB( const T&... args ) : encrypt_t( args..., EVP_aes_128_ecb() ) {}
     };
-    
+
     class AES_192_ECB : public encrypt_t { public: template< class... T >
           AES_192_ECB( const T&... args ) : encrypt_t( args..., EVP_aes_192_ecb() ) {}
     };
-    
+
     class AES_256_ECB : public encrypt_t { public: template< class... T >
           AES_256_ECB( const T&... args ) : encrypt_t( args..., EVP_aes_256_ecb() ) {}
     };
 
     /*─······································································─*/
-    
+
     class TRIPLE_DES_CBC : public encrypt_t { public: template< class... T >
           TRIPLE_DES_CBC ( const T&... args ) : encrypt_t( args..., EVP_des_ede3_cbc() ) {}
     };
-    
+
     class TRIPLE_DES_ECB : public encrypt_t { public: template< class... T >
           TRIPLE_DES_ECB ( const T&... args ) : encrypt_t( args..., EVP_des_ede3_ecb() ) {}
     };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace decrypt {
+namespace crypto::decrypt{
 
-    class RSA : public rsa_t { public: template< class... T > 
+    class RSA : public rsa_t { public: template< class... T >
           RSA ( const T&... args ) : rsa_t( args... ) {}
     };
 
     /*─······································································─*/
-    
+
     class XOR : public xor_t { public: template< class... T >
           XOR ( const T&... args ) : xor_t( args... ) {}
     };
 
     /*─······································································─*/
-    
+
     class DES_CBC : public decrypt_t { public: template< class... T >
           DES_CBC ( const T&... args ) : decrypt_t( args..., EVP_des_ede_cbc() ) {}
     };
-    
+
     class DES_ECB : public decrypt_t { public: template< class... T >
           DES_ECB ( const T&... args ) : decrypt_t( args..., EVP_des_ede_ecb() ) {}
     };
 
     /*─······································································─*/
-    
+
     class AES_128_CBC : public decrypt_t { public: template< class... T >
           AES_128_CBC( const T&... args ) : decrypt_t( args..., EVP_aes_128_cbc() ) {}
     };
-    
+
     class AES_192_CBC : public decrypt_t { public: template< class... T >
           AES_192_CBC( const T&... args ) : decrypt_t( args..., EVP_aes_192_cbc() ) {}
     };
-    
+
     class AES_256_CBC : public decrypt_t { public: template< class... T >
           AES_256_CBC( const T&... args ) : decrypt_t( args..., EVP_aes_256_cbc() ) {}
     };
 
     /*─······································································─*/
-    
+
     class AES_128_ECB : public decrypt_t { public: template< class... T >
           AES_128_ECB( const T&... args ) : decrypt_t( args..., EVP_aes_128_ecb() ) {}
     };
-    
+
     class AES_192_ECB : public decrypt_t { public: template< class... T >
           AES_192_ECB( const T&... args ) : decrypt_t( args..., EVP_aes_192_ecb() ) {}
     };
-    
+
     class AES_256_ECB : public decrypt_t { public: template< class... T >
           AES_256_ECB( const T&... args ) : decrypt_t( args..., EVP_aes_256_ecb() ) {}
     };
 
     /*─······································································─*/
-    
+
     class TRIPLE_DES_CBC : public decrypt_t { public: template< class... T >
           TRIPLE_DES_CBC ( const T&... args ) : decrypt_t( args..., EVP_des_ede3_cbc() ) {}
     };
-    
+
     class TRIPLE_DES_ECB : public decrypt_t { public: template< class... T >
           TRIPLE_DES_ECB ( const T&... args ) : decrypt_t( args..., EVP_des_ede3_ecb() ) {}
     };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace encoder {
+namespace crypto::encoder{
 
     class BASE58 : public encoder_t { public:
           BASE58 () : encoder_t( "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" ) {}
     };
 
-    class BASE16 : public encoder_t { public: 
+    class BASE16 : public encoder_t { public:
           BASE16 () : encoder_t( "123456789ABCDEF" ){}
     };
 
-    class BASE8 : public encoder_t { public: 
+    class BASE8 : public encoder_t { public:
           BASE8 () : encoder_t( "1234567" ){}
     };
 
-    class BASE4 : public encoder_t { public: 
+    class BASE4 : public encoder_t { public:
           BASE4 () : encoder_t( "123" ){}
     };
 
@@ -1379,25 +1379,25 @@ namespace crypto { namespace encoder {
           BASE64 () : base64_encoder_t() {}
     };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace decoder {
+namespace crypto::decoder{
 
     class BASE58 : public decoder_t { public:
           BASE58 () : decoder_t( "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" ) {}
     };
 
-    class BASE16 : public decoder_t { public: 
+    class BASE16 : public decoder_t { public:
           BASE16 () : decoder_t( "123456789ABCDEF" ){}
     };
 
-    class BASE8 : public decoder_t { public: 
+    class BASE8 : public decoder_t { public:
           BASE8 () : decoder_t( "1234567" ){}
     };
 
-    class BASE4 : public decoder_t { public: 
+    class BASE4 : public decoder_t { public:
           BASE4 () : decoder_t( "123" ){}
     };
 
@@ -1405,76 +1405,76 @@ namespace crypto { namespace decoder {
           BASE64 () : base64_decoder_t() {}
     };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace curve { //openssl ecparam -list_curves
-    
+namespace crypto::curve{ //openssl ecparam -list_curves
+
     class PRIME256V1: public ec_t { public: template< class... T >
           PRIME256V1( const T&... args ) noexcept : ec_t( args..., NID_X9_62_prime256v1 ) {}
     };
-    
+
     class PRIME192V1 : public ec_t { public: template< class... T >
           PRIME192V1( const T&... args ) noexcept : ec_t( args..., NID_X9_62_prime192v1 ) {}
     };
 
     /*─······································································─*/
-    
+
     class SECP128R1 : public ec_t { public: template< class... T >
           SECP128R1( const T&... args ) noexcept : ec_t( args..., NID_secp128r1 ) {}
     };
-    
+
     class SECP128R2 : public ec_t { public: template< class... T >
           SECP128R2( const T&... args ) noexcept : ec_t( args..., NID_secp128r2 ) {}
     };
 
     /*─······································································─*/
-    
+
     class SECP160R1 : public ec_t { public: template< class... T >
           SECP160R1( const T&... args ) noexcept : ec_t( args..., NID_secp160r1 ) {}
     };
-    
+
     class SECP160R2 : public ec_t { public: template< class... T >
           SECP160R2( const T&... args ) noexcept : ec_t( args..., NID_secp160r2 ) {}
     };
-    
+
     class SECP160K1 : public ec_t { public: template< class... T >
           SECP160K1( const T&... args ) noexcept : ec_t( args..., NID_secp160k1 ) {}
     };
 
     /*─······································································─*/
-    
+
     class SECP256K1 : public ec_t { public: template< class... T >
           SECP256K1( const T&... args ) noexcept : ec_t( args..., NID_secp256k1 ) {}
     };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace sign {
-    
+namespace crypto::sign{
+
     class DSA : public dsa_t { public: template< class... T >
           DSA ( const T&... args ) : dsa_t ( args... ) {}
     };
-    
+
     class DH : public dh_t { public: template< class... T >
           DH ( const T&... args ) : dh_t ( args... ) {}
     };
 
-}}
-    
+}
+
     /*─······································································─*/
 
-namespace crypto { namespace certificate {
+namespace crypto::certificate{
 
-    class X509 : public X509_t { public: template< class... T > 
+    class X509 : public X509_t { public: template< class... T >
           X509 ( const T&... args ) : X509_t ( args... ) {}
     };
 
-}}
-  
+}
+
     /*─······································································─*/
 
 }

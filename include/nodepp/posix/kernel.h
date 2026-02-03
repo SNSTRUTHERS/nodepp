@@ -44,8 +44,8 @@ private:
     using EPOLLFD = struct epoll_event;
     using ETIMER  = struct timespec;
 
-    enum FLAG { 
-         KV_STATE_UNKNONW = 0b00000000, 
+    enum FLAG {
+         KV_STATE_UNKNOWN = 0b00000000,
          KV_STATE_WRITE   = 0b00000001,
          KV_STATE_READ    = 0b00000010,
          KV_STATE_EDGE    = 0b10000000,
@@ -56,10 +56,10 @@ private:
 
     struct kevent_t { public:
         function_t<int> callback;
-        ulong timeout; int fd, flag; 
+        ulong timeout; int fd, flag;
     };
 
-    bool is_std( int fd ) const noexcept { 
+    bool is_std( int fd ) const noexcept {
         return fd == STDOUT_FILENO ||
                fd == STDIN_FILENO  ||
                fd == STDERR_FILENO ;
@@ -76,7 +76,7 @@ protected:
         auto id = tm==nullptr ? obj->kv_queue.last(): tm->prev;
 
         EPOLLFD event  ; memset( &event, 0, sizeof( EPOLLFD ) );
-        event.events   = id->data.flag & FLAG::KV_STATE_READ 
+        event.events   = id->data.flag & FLAG::KV_STATE_READ
                        ? EPOLLIN : EPOLLOUT ;
         event.events  |= id->data.flag & FLAG::KV_STATE_EDGE
                        ? EPOLLET : 0x00 ;
@@ -85,19 +85,19 @@ protected:
 
         if( epoll_ctl( obj->pd, EPOLL_CTL_ADD, id->data.fd, &event )!=0 )
           { obj->kv_queue.erase(id); return nullptr; }
-        
+
     return (void*)id; }
 
     int remove( void* ptr ) const noexcept {
         if( ptr == nullptr ){ return -1; }
 
         auto kv = obj->kv_queue.as( ptr );
-        auto fl = kv->data.flag;
+        [[maybe_unused]] auto fl = kv->data.flag;
         auto fd = kv->data.fd;
 
         EPOLLFD event; event.data.fd=fd; event.events=0;
         epoll_ctl( obj->pd, EPOLL_CTL_DEL, fd, &event );
-    
+
     obj->kv_queue.erase(kv); return 0; }
 
     /*─······································································─*/
@@ -119,18 +119,18 @@ protected:
 
         ulong tasks= obj->ev_queue.size() + obj->probe.get();
         ulong time = TIMEOUT; /*-*/ time = time == 0 ? 1: time;
-        
-        int out = ( tasks==0 && obj->kv_queue.size()> 0 )? -1: 
-                  ( tasks==0 && obj.count()         > 1 )? -1: time;
+
+        int out = ( tasks==0 && obj->kv_queue.size()> 0 )? -1:
+                  ( tasks==0 && obj.count()         > 1 )? -1: (int)time;
 
     ts->tv_sec = 0; ts->tv_nsec = out * 1000000;
     return out==-1 ? nullptr : ts; }
 
-    int get_delay_ms() const noexcept { 
+    int get_delay_ms() const noexcept {
         ulong tasks= obj->ev_queue.size() + obj->probe.get();
         ulong time = TIMEOUT; time = time == 0 ? 1: time;
-        return ( tasks==0 && obj->kv_queue.size()>0 )?-1: 
-               ( tasks==0 && obj.count()         >1 )?-1: time;
+        return ( tasks==0 && obj->kv_queue.size()>0 )?-1:
+               ( tasks==0 && obj.count()         >1 )?-1: (int)time;
     }
 
 protected:
@@ -140,28 +140,28 @@ protected:
         queue_t<kevent_t> kv_queue;
         probe_t /*-----*/ probe;
         ptr_t<EPOLLFD>    ev;
-        int pd, ed, idx; 
+        int pd, ed, idx;
         bool pl = true ;
     };  ptr_t<NODE> obj;
 
 public:
 
-   ~kernel_t() noexcept { 
-        if( obj.count() > 1 ){ return; } 
-        close( obj->ed ); close( obj->pd ); 
+   ~kernel_t() noexcept {
+        if( obj.count() > 1 ){ return; }
+        close( obj->ed ); close( obj->pd );
     }
 
     kernel_t() : obj( new NODE() ) {
         obj->ed = eventfd( 0, EFD_CLOEXEC | EFD_NONBLOCK );
-        obj->pd = epoll_create1( EPOLL_CLOEXEC ); 
+        obj->pd = epoll_create1( EPOLL_CLOEXEC );
 
     if( obj->pd==-1 || obj->ed==-1 )
       { throw except_t("Can't Open More kernel_t"); }
         obj->ev.resize( MAX_PATH );
 
         EPOLLFD event;
-        event.data.fd  = obj->ed; 
-        event.data.ptr = nullptr; 
+        event.data.fd  = obj->ed;
+        event.data.ptr = nullptr;
         event.events   = EPOLLIN;
 
     if( epoll_ctl( obj->pd, EPOLL_CTL_ADD, obj->ed, &event )==-1 )
@@ -186,7 +186,7 @@ public:
         if( address->sign == &obj ){
         if( address->flag & TASK_STATE::CLOSED ){ return; }
             address->flag = TASK_STATE::CLOSED;
-            remove( address->addr ); 
+            remove( address->addr );
         } else { obj->ev_queue.off( address ); }
     }
 
@@ -196,17 +196,17 @@ public:
     ptr_t<task_t> poll_add( T& inp, int flag, U cb, ulong timeout=0, const W&... args ) noexcept {
     ptr_t<task_t> task( 0UL, task_t() ); auto clb = type::bind( cb );
 
-        kevent_t       kv; 
+        kevent_t       kv;
         kv.flag      = flag;
         kv.fd        = inp.get_fd();
         kv.timeout   = timeout==0 ? 0 : process::now() + timeout;
-        
+
         kv.callback  = [=](){ int c=(*clb)( args... );
-            if( inp.is_closed () ){ return -1; } 
+            if( inp.is_closed () ){ return -1; }
             if( inp.is_waiting() ){ return  0; }
         return c; };
 
-        task->addr   = append( kv ); 
+        task->addr   = append( kv );
         task->sign   = &obj;
 
     return task->addr==nullptr ? loop_add( cb, args... ) : task; }
@@ -218,20 +218,22 @@ public:
 
     /*─······································································─*/
 
-    int emit() const noexcept { uint64_t value=1; 
-    return ::write(obj->ed,&value,sizeof(value)); }
+    int emit() const noexcept {
+        uint64_t value=1;
+        return (int)::write(obj->ed,&value,sizeof(value));
+    }
 
     /*─······································································─*/
 
-    template< class T, class... V > 
-    int await( T cb, const V&... args ){ 
+    template< class T, class... V >
+    int await( T cb, const V&... args ){
     int c=0; probe_t tmp = obj->probe;
 
         if ((c =cb(args...))>=0 ){
         if ( c==1 ){ auto t = coroutine::getno().delay;
-        if ( t >0 ){ process::set_timeout( t ); }
-        else /*-*/ { process::set_timeout(0UL); }} next(); return 1; } 
-    
+        if ( t >0 ){ process::set_timeout( (int)t ); }
+        else /*-*/ { process::set_timeout(0UL); }} next(); return 1; }
+
     return -1; }
 
     /*─······································································─*/
@@ -247,9 +249,9 @@ public:
         else { break; } x=y; }} while(0);
 
     #if   defined( SYS_epoll_pwait2 )
-        if( obj->pl ){ obj->idx=epoll_pwait2( obj->pd, &obj->ev, obj->ev.size(), &get_delay(), nullptr ); }
+        if( obj->pl ){ obj->idx=epoll_pwait2( obj->pd, &obj->ev, (int)obj->ev.size(), &get_delay(), nullptr ); }
         if( obj->idx==-1 && errno==ENOSYS ) { obj->pl = false; }
-        if(!obj->pl ){ obj->idx=epoll_wait( obj->pd, &obj->ev, obj->ev.size(), get_delay_ms() ); }
+        if(!obj->pl ){ obj->idx=epoll_wait( obj->pd, &obj->ev, (int)obj->ev.size(), get_delay_ms() ); }
     #elif defined( SYS_epoll_pwait )
         obj->idx=epoll_pwait( obj->pd, &obj->ev, obj->ev.size(), get_delay_ms(), nullptr );
     #else
@@ -257,12 +259,12 @@ public:
     #endif
 
         while( obj->idx --> 0 ){ do {
-        if( obj->ev[ obj->idx ].data.ptr==nullptr ){
-            uint64_t value=0; int c=0;
-            c=::read( obj->ed,&value, sizeof(value));
+        if( obj->ev[ (ulong)obj->idx ].data.ptr==nullptr ){
+            uint64_t value=0;
+            ::read( obj->ed,&value, sizeof(value));
         break; }
 
-            auto x = obj->ev[ obj->idx ];
+            auto x = obj->ev[ (ulong)obj->idx ];
             auto y = obj->kv_queue.as( x.data.ptr );
             if( !obj->kv_queue.is_valid( y ) ){ break; }
 
@@ -306,8 +308,8 @@ private:
     using KTIMER  = struct timespec;
     using KPOLLFD = struct kevent;
 
-    enum FLAG { 
-         KV_STATE_UNKNONW = 0b00000000, 
+    enum FLAG {
+         KV_STATE_UNKNOWN = 0b00000000,
          KV_STATE_WRITE   = 0b00000001,
          KV_STATE_READ    = 0b00000010,
          KV_STATE_EDGE    = 0b10000000,
@@ -318,10 +320,10 @@ private:
 
     struct kevent_t { public:
         function_t<int> callback;
-        ulong timeout; int fd, flag; 
+        ulong timeout; int fd, flag;
     };
 
-    bool is_std() const noexcept { 
+    bool is_std() const noexcept {
         return obj->fd == stdin  ||
                obj->fd == stdout ||
                obj->fd == stderr ;
@@ -339,7 +341,7 @@ protected:
 
         KPOLLFD event  ;
         int fd = id->data.fd;
-        int fl = id->data.flag & FLAG::KV_STATE_READ 
+        int fl = id->data.flag & FLAG::KV_STATE_READ
                ? EVFILT_READ : EVFILT_WRITE;
 
         int fc = EV_ADD|EV_ENABLE;
@@ -350,14 +352,14 @@ protected:
 
         if( kevent( obj->pd, &event, 1, NULL, 0, NULL ) !=0 )
           { obj->kv_queue.erase(id); return nullptr; }
-        
+
     return id; }
 
     int remove( void* ptr ) const noexcept {
         if( !obj->kv_queue.is_valid(ptr) ){ return -1; }
 
         auto kv = obj->kv_queue.as( ptr );
-        int  fl = kv->data.flag & FLAG::KV_STATE_READ 
+        int  fl = kv->data.flag & FLAG::KV_STATE_READ
                 ? EVFILT_READ : EVFILT_WRITE;
         auto fd = kv->data.fd;
 
@@ -386,17 +388,17 @@ protected:
 
         ulong tasks= obj->ev_queue.size() + obj->probe.get();
         ulong time = TIMEOUT; /*-*/ time = time == 0 ? 1: time;
-        
-        int out = ( tasks==0 && obj->kv_queue.size()> 0 )? -1: 
+
+        int out = ( tasks==0 && obj->kv_queue.size()> 0 )? -1:
                   ( tasks==0 && obj.count()         > 1 )? -1: time;
 
     ts->tv_sec = 0; ts->tv_nsec = out * 1000000;
     return out==-1 ? nullptr : ts; }
 
-    int get_delay_ms() const noexcept { 
+    int get_delay_ms() const noexcept {
         ulong tasks= obj->ev_queue.size() + obj->probe.get();
         ulong time = TIMEOUT; time = time == 0 ? 1: time;
-        return ( tasks==0 && obj->kv_queue.size()>0 )?-1: 
+        return ( tasks==0 && obj->kv_queue.size()>0 )?-1:
                ( tasks==0 && obj.count()         >1 )?-1: time;
     }
 
@@ -407,13 +409,13 @@ protected:
         queue_t<kevent_t> kv_queue;
         probe_t /*-----*/ probe;
         ptr_t<KPOLLFD>    ev;
-        int pd, idx; 
+        int pd, idx;
     };  ptr_t<NODE> obj;
 
 public:
 
-   ~kernel_t() noexcept { 
-        if( obj.count() > 1 ){ return; } close( obj->pd ); 
+   ~kernel_t() noexcept {
+        if( obj.count() > 1 ){ return; } close( obj->pd );
     }
 
     kernel_t() : obj( new NODE() ) {
@@ -425,7 +427,7 @@ public:
 
         KPOLLFD ev;
         EV_SET( &ev, 0, EVFILT_USER, EV_ADD, 0, 0, nullptr );
-        
+
     if( kevent( obj->pd, &ev, 1, NULL, 0, NULL ) == -1 )
       { throw except_t("Can't Initialize kernel_t"); }
 
@@ -458,17 +460,17 @@ public:
     ptr_t<task_t> poll_add( T& inp, int flag, U cb, ulong timeout=0, const W&... args ) noexcept {
     ptr_t<task_t> task( 0UL, task_t() ); auto clb = type::bind( cb );
 
-        kevent_t       kv; 
+        kevent_t       kv;
         kv.flag      = flag;
         kv.fd        = inp.get_fd();
         kv.timeout   = timeout==0 ? 0 : process::now() + timeout;
-        
+
         kv.callback  = [=](){ int c=(*clb)( args... );
-            if( inp.is_closed () ){ return -1; } 
+            if( inp.is_closed () ){ return -1; }
             if( inp.is_waiting() ){ return  0; }
         return c; };
 
-        task->addr   = append( kv ); 
+        task->addr   = append( kv );
         task->sign   = &obj;
 
     return task->addr==nullptr ? loop_add( cb, args... ) : task; }
@@ -498,10 +500,10 @@ public:
                auto y=x->next; if( x->data.timeout==0 ){ break; }
         if   ( x->data.timeout < process::now() ){ remove(x); }
         else { break; } x=y; }} while(0);
-        
+
         while( obj->idx --> 0 ){ do {
         if( obj->ev[ obj->idx ].filter==EVFILT_USER ){ break; }
-            
+
             auto x = obj->ev[ obj->idx ];
             auto y = obj->kv_queue.as( x.udata );
             if( !obj->kv_queue.is_valid( y ) ){ break; }
@@ -540,8 +542,8 @@ public:
 namespace nodepp { class kernel_t: public generator_t {
 private:
 
-    enum FLAG { 
-         KV_STATE_UNKNONW = 0b00000000, 
+    enum FLAG {
+         KV_STATE_UNKNOWN = 0b00000000,
          KV_STATE_WRITE   = 0b00000001,
          KV_STATE_READ    = 0b00000010,
          KV_STATE_EDGE    = 0b10000000,
@@ -552,12 +554,12 @@ private:
 
     struct kevent_t { public:
         function_t<int> callback;
-        ulong timeout; int fd, flag; 
+        ulong timeout; int fd, flag;
     };
 
     /*─······································································─*/
 
-    int get_delay() const noexcept { 
+    int get_delay() const noexcept {
         ulong tasks= obj->ev_queue.size() + obj->probe.get();
         ulong time = TIMEOUT; /*-*/ time = time == 0  ?  10: time;
         return ( tasks==0 && obj.count()         > 1 )? 100: time;
@@ -599,9 +601,9 @@ public:
     template< class T, class U, class... W >
     ptr_t<task_t> poll_add ( T /*unused*/, int /*unused*/, U cb, ulong timeout=0, const W&... args ) noexcept {
         auto time = type::bind( timeout>0 ? timeout + process::now() : timeout );
-        auto clb  = type::bind( cb ); return obj->ev_queue.add( [=](){ 
+        auto clb  = type::bind( cb ); return obj->ev_queue.add( [=](){
         if( *time > 0 && *time < process::now() ){ return -1; }
-            return (*clb)( args... )>=0 ? 1 : -1; 
+            return (*clb)( args... )>=0 ? 1 : -1;
         } );
     }
 
@@ -612,15 +614,15 @@ public:
 
     /*─······································································─*/
 
-    template< class T, class... V > 
-    int await( T cb, const V&... args ){ 
+    template< class T, class... V >
+    int await( T cb, const V&... args ){
     int c=0; probe_t tmp = obj->probe;
 
         if ((c =cb(args...))>=0 ){
         if ( c==1 ){ auto t = coroutine::getno().delay;
         if ( t >0 ){ process::set_timeout( t ); }
-        else /*-*/ { process::set_timeout(0UL); }} next(); return 1; } 
-    
+        else /*-*/ { process::set_timeout(0UL); }} next(); return 1; }
+
     return -1; }
 
     /*─······································································─*/
