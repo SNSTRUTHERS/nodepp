@@ -54,7 +54,7 @@ template< class T > T clamp( const T& val, const T& _min, const T& _max ){ retur
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-#define COROUTINE()     [=]( int& _state_, ulong& _time_ )
+#define COROUTINE(...) [=__VA_OPT__(,)__VA_ARGS__]( int& _state_, ulong& _time_ )
 #define GENERATOR(NAME) struct NAME : public generator_t
 
 /*────────────────────────────────────────────────────────────────────────────*/

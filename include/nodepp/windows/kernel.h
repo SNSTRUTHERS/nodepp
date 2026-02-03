@@ -101,7 +101,7 @@ protected:
         if( y->data.flag & FLAG::KV_STATE_USED ){ return; }
             y->data.flag|= FLAG::KV_STATE_USED;
 
-        obj->ev_queue.add( coroutine::add( COROUTINE(){
+        obj->ev_queue.add( coroutine::add( COROUTINE(this){
         coBegin
 
             do { switch( y->data.callback() ) {
