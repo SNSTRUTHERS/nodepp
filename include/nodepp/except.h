@@ -68,7 +68,7 @@ public:
     void       print() const noexcept { console::error(obj->msg); }
     bool       empty() const noexcept { return obj->msg.empty(); }
     const char* what() const noexcept { return obj->msg.c_str(); }
-    operator   char*() const noexcept { return (char*)what(); }
+    operator char const*() const noexcept { return what(); }
     string_t    data() const noexcept { return obj->msg; }
     string_t   value() const noexcept { return obj->msg; }
 

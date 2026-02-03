@@ -222,7 +222,7 @@ public:
     void set_password( const char* pass ) const noexcept {
         if( !obj->stt ){ return; }
         SSL_CTX_set_default_passwd_cb( obj->ctx, &SNI_CLB );
-        SSL_CTX_set_default_passwd_cb_userdata( obj->ctx, (void*)pass );
+        SSL_CTX_set_default_passwd_cb_userdata( obj->ctx, (void*)const_cast<char*>(pass) );
     }
 
     int set_hostname( const string_t& name ) const noexcept {

@@ -727,7 +727,7 @@ public:
 
     string_t write_private_key_to_memory( const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
-        PEM_write_bio_RSAPrivateKey( bo, obj->rsa, NULL, NULL, 0, &PASS_CLB, (void*)pass );
+        PEM_write_bio_RSAPrivateKey( bo, obj->rsa, NULL, NULL, 0, &PASS_CLB, (void*)const_cast<char*>(pass) );
         long len = BIO_get_mem_data( bo, &data ); string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
     }
@@ -796,21 +796,21 @@ public:
 
     void read_private_key_from_memory( const string_t& key, const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
-        if( !PEM_read_bio_RSAPrivateKey( bo, &obj->rsa, &PASS_CLB, (void*)pass ) ){
+        if( !PEM_read_bio_RSAPrivateKey( bo, &obj->rsa, &PASS_CLB, (void*)const_cast<char*>(pass) ) ){
             BIO_free(bo); throw except_t( "Invalid RSA Key" );
         }   BIO_free(bo); obj->bff.resize((ulong)RSA_size(obj->rsa));
     }
 
     void read_public_key_from_memory( const string_t& key, const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
-        if( !PEM_read_bio_RSAPublicKey( bo, &obj->rsa, &PASS_CLB, (void*)pass ) ){
+        if( !PEM_read_bio_RSAPublicKey( bo, &obj->rsa, &PASS_CLB, (void*)const_cast<char*>(pass) ) ){
             BIO_free(bo); throw except_t( "Invalid RSA Key" );
         }   BIO_free(bo); obj->bff.resize((ulong)RSA_size(obj->rsa));
     }
 
     string_t write_private_key_to_memory( const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
-        PEM_write_bio_RSAPrivateKey( bo, obj->rsa, NULL, NULL, 0, &PASS_CLB, (void*)pass );
+        PEM_write_bio_RSAPrivateKey( bo, obj->rsa, NULL, NULL, 0, &PASS_CLB, (void*)const_cast<char*>(pass) );
         long len = BIO_get_mem_data( bo, &data );
         string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
@@ -943,8 +943,8 @@ public:
         EC_KEY_set_group( obj->key_pair, obj->key_group );
         EC_KEY_generate_key( obj->key_pair );
 
-        obj->pub_key  = (EC_POINT*) EC_KEY_get0_public_key( obj->key_pair );
-        obj->priv_key = (BIGNUM*)  EC_KEY_get0_private_key( obj->key_pair );
+        obj->pub_key  = const_cast<EC_POINT*>(EC_KEY_get0_public_key( obj->key_pair ));
+        obj->priv_key = const_cast<BIGNUM*>(EC_KEY_get0_private_key( obj->key_pair ));
     }
 
    ~ec_t() noexcept { if( obj.count()>1 ){ return; } free(); }
@@ -1088,19 +1088,19 @@ public:
 
     void read_private_key_from_memory( const string_t& key, const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
-        if( !PEM_read_bio_DSAPrivateKey( bo, &obj->dsa, &PASS_CLB, (void*)pass ) )
+        if( !PEM_read_bio_DSAPrivateKey( bo, &obj->dsa, &PASS_CLB, (void*)const_cast<char*>(pass) ) )
           { BIO_free(bo); throw except_t( "Invalid DSA Key" ); } BIO_free(bo);
     }
 
     void read_public_key_from_memory( const string_t& key, const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); BIO_write( bo, key.get(), (int)key.size() );
-        if( !PEM_read_bio_DSA_PUBKEY( bo, &obj->dsa, &PASS_CLB, (void*)pass ) )
+        if( !PEM_read_bio_DSA_PUBKEY( bo, &obj->dsa, &PASS_CLB, (void*)const_cast<char*>(pass) ) )
           { BIO_free(bo); throw except_t( "Invalid DSA Key" ); } BIO_free(bo);
     }
 
     string_t write_private_key_to_memory( const char* pass=NULL ) const {
         BIO* bo = BIO_new( BIO_s_mem() ); char* data;
-        PEM_write_bio_DSAPrivateKey( bo, obj->dsa, NULL, NULL, 0, &PASS_CLB, (void*)pass );
+        PEM_write_bio_DSAPrivateKey( bo, obj->dsa, NULL, NULL, 0, &PASS_CLB, (void*)const_cast<char*>(pass) );
         long len = BIO_get_mem_data( bo, &data );
         string_t res ( data, (ulong)len );
         BIO_free(bo); return res;
