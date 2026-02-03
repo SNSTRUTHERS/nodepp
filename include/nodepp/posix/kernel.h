@@ -253,9 +253,9 @@ public:
         if( obj->idx==-1 && errno==ENOSYS ) { obj->pl = false; }
         if(!obj->pl ){ obj->idx=epoll_wait( obj->pd, &obj->ev, (int)obj->ev.size(), get_delay_ms() ); }
     #elif defined( SYS_epoll_pwait )
-        obj->idx=epoll_pwait( obj->pd, &obj->ev, obj->ev.size(), get_delay_ms(), nullptr );
+        obj->idx=epoll_pwait( obj->pd, &obj->ev, (int)obj->ev.size(), get_delay_ms(), nullptr );
     #else
-        obj->idx=epoll_wait( obj->pd, &obj->ev, obj->ev.size(), get_delay_ms() );
+        obj->idx=epoll_wait( obj->pd, &obj->ev, (int)obj->ev.size(), get_delay_ms() );
     #endif
 
         while( obj->idx --> 0 ){ do {
@@ -562,7 +562,7 @@ private:
     int get_delay() const noexcept {
         ulong tasks= obj->ev_queue.size() + obj->probe.get();
         ulong time = TIMEOUT; /*-*/ time = time == 0  ?  10: time;
-        return ( tasks==0 && obj.count()         > 1 )? 100: time;
+        return ( tasks==0 && obj.count()         > 1 )? 100: (int)time;
     }
 
 protected:
@@ -620,7 +620,7 @@ public:
 
         if ((c =cb(args...))>=0 ){
         if ( c==1 ){ auto t = coroutine::getno().delay;
-        if ( t >0 ){ process::set_timeout( t ); }
+        if ( t >0 ){ process::set_timeout( int(t) ); }
         else /*-*/ { process::set_timeout(0UL); }} next(); return 1; }
 
     return -1; }
@@ -633,7 +633,7 @@ public:
         coWait( obj->ev_queue.next()>=0 );
 
         process::set_timeout( obj->ev_queue.get_delay() );
-        process::delay( get_delay() );
+        process::delay( (ulong)get_delay() );
         process::clear_timeout();
 
     coFinish }
