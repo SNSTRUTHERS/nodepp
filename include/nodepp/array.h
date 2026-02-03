@@ -14,6 +14,14 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+#include "function.h"
+#include "ptr.h"
+#include "string.h"
+#include "queue.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { template< class T >
 class array_t {
 protected:

@@ -14,6 +14,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
 #include "encoder.h"
 #include "query.h"
 #include "regex.h"

@@ -16,6 +16,13 @@
 
 #include <unistd.h>
 #include <sys/wait.h>
+#include "../array.h"
+#include "../coroutine.h"
+#include "../except.h"
+#include "../file.h"
+#include "../initializer.h"
+#include "../regex.h"
+#include "../sleep.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

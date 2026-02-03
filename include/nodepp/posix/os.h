@@ -14,8 +14,16 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#ifdef uint
+#   undef uint
+#endif
+#ifdef ulong
+#   undef ulong
+#endif
 #include <unistd.h>
 #include <cerrno>
+#include <cstdlib>
+#include "../string.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

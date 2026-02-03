@@ -17,6 +17,9 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <time.h>
+#include "../except.h"
+#include "../file.h"
+#include "../stream.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

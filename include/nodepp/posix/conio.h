@@ -17,6 +17,8 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "../string.h"
+#include "../iterator.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

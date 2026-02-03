@@ -16,6 +16,15 @@
 
 #include <unistd.h>
 #include <sys/wait.h>
+#include "../coroutine.h"
+#include "../env.h"
+#include "../except.h"
+#include "../fs.h"
+#include "../initializer.h"
+
+namespace nodepp::process {
+    inline array_t<string_t> args;
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

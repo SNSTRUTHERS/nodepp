@@ -13,6 +13,10 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 #if !defined(GENERATOR_TIMER) && defined(NODEPP_TIMER) && defined(NODEPP_GENERATOR)
     #define  GENERATOR_TIMER
 namespace nodepp { namespace generator { namespace timer {

@@ -14,8 +14,15 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#ifdef uint
+#   undef uint
+#endif
+#ifdef ulong
+#   undef ulong
+#endif
 #include <sys/resource.h>
 #include "os.h"
+#define uint unsigned int
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

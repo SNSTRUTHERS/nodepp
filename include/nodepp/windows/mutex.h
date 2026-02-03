@@ -16,6 +16,8 @@
 
 #include <windows.h>
 #include <processthreadsapi.h>
+#include "../except.h"
+#include "../sleep.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

@@ -12,6 +12,9 @@
 #ifndef NODEPP_PTR
 #define NODEPP_PTR
 
+#include "macros.h"
+#include "type.h"
+
 /*────────────────────────────────────────────────────────────────────────────*/
 
 namespace nodepp { template< class T, ulong STACK_SIZE=MAX_SSO > class ptr_t {

@@ -14,7 +14,19 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#ifdef uint
+#   undef uint
+#endif
+#ifdef ulong
+#   undef ulong
+#endif
 #include <csignal>
+#include <cstdlib>
+#ifndef uint
+#   define uint unsigned int
+#endif
+#include "conio.h"
+#include "console.h"
 #include "event.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/

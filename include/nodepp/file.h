@@ -14,6 +14,10 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 #if   _KERNEL_ == NODEPP_KERNEL_WINDOWS
     #include "os.h"
     #include "limit.h"
@@ -23,7 +27,7 @@
 #elif _KERNEL_ == NODEPP_KERNEL_POSIX
     #include "os.h"
     #include "limit.h"
-    #include "event.h"
+    #include "evloop.h"
     #include "generator.h"
     #include "posix/file.h"
 #else

@@ -14,6 +14,11 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+#include "function.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 #if   _KERNEL_ == NODEPP_KERNEL_WINDOWS
     #include "windows/mutex.h"
 #elif _KERNEL_ == NODEPP_KERNEL_POSIX

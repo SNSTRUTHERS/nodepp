@@ -14,6 +14,10 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 #if   _KERNEL_ == NODEPP_KERNEL_WINDOWS
     #include "windows/kernel.h"
 #elif _KERNEL_ == NODEPP_KERNEL_POSIX

@@ -14,6 +14,14 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "coroutine.h"
+#include "function.h"
+#include "queue.h"
+#include "sleep.h"
+#include "task.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { class loop_t {
 private:
 

@@ -9,6 +9,15 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "../macros.h"
+#include "../except.h"
+#include "../loop.h"
+#include "../probe.h"
+#undef ulong
+#undef uint
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 #ifndef NODEPP_POSIX_KERNEL
 #define NODEPP_POSIX_KERNEL
 #if  ( _OS_ == NODEPP_OS_FRBSD ) || ( _OS_ == NODEPP_OS_APPLE )
@@ -24,10 +33,10 @@
 
 #ifdef NODEPP_POLL_EPOLL
 
+#include <cerrno>
 #include <sys/syscall.h>
 #include <sys/eventfd.h>
 #include <sys/epoll.h>
-#include "../loop.h"
 
 namespace nodepp { class kernel_t: public generator_t {
 private:

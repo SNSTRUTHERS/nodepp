@@ -12,6 +12,14 @@
 #ifndef NODEPP_EXCEPT
 #define NODEPP_EXCEPT
 
+#include "macros.h"
+#include "console.h"
+#include "iterator.h"
+#include "ptr.h"
+#include "signal.h"
+#include "string.h"
+#include "task.h"
+
 /*────────────────────────────────────────────────────────────────────────────*/
 
 namespace nodepp { class except_t {

@@ -14,7 +14,8 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-#include "wait.h" 
+#include "macros.h"
+#include "wait.h"
 #include "type.h"
 #include "map.h"
 #include "any.h"

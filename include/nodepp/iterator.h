@@ -12,7 +12,14 @@
 #ifndef NODEPP_ITERATOR
 #define NODEPP_ITERATOR
 
-namespace nodepp { namespace iterator {
+/*────────────────────────────────────────────────────────────────────────────*/
+
+#include "macros.h"
+#include "array.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
+namespace nodepp::iterator {
 
     template< class U >
     void map( U func ){ }
@@ -82,8 +89,8 @@ namespace nodepp { namespace iterator {
 	     iterator::map([&]( T argc ){ if( func(argc) ){ ++n; }}, argc, args... ); 
 	     return ( n == 0 );
     }
-    
-}}
+
+}
 
 #endif
 

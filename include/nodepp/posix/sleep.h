@@ -14,8 +14,21 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#ifdef uint
+#   undef uint
+#endif
+#ifdef ulong
+#   undef ulong
+#endif
 #include <unistd.h>
 #include <sys/time.h>
+#include "../macros.h"
+#ifndef uint
+#   define uint unsigned int
+#endif
+#ifndef ulong
+#   define ulong unsigned long
+#endif
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

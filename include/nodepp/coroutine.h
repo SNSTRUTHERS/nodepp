@@ -14,7 +14,13 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { class coroutine_t { 
+#include <cstring>
+#include "macros.h"
+#include "function.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
+namespace nodepp { class coroutine_t {
 private:
 
     using T = function_t<int,int&,ulong&>;

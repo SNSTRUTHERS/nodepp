@@ -15,6 +15,7 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include <cerrno>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -22,6 +23,14 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include <unistd.h>
+#include "../evloop.h"
+#include "../except.h"
+#include "../file.h"
+#include "../os.h"
+#include "../sleep.h"
+#include "../string.h"
+#include "limit.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

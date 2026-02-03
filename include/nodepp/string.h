@@ -12,6 +12,13 @@
 #ifndef NODEPP_STRING
 #define NODEPP_STRING
 
+#include <cstdio>
+#include <cstring>
+#include "function.h"
+#include "macros.h"
+#include "ptr.h"
+#include "queue.h"
+
 /*────────────────────────────────────────────────────────────────────────────*/
 
 namespace nodepp {

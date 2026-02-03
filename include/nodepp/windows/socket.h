@@ -18,6 +18,8 @@
 #include <winsock2.h>
 #include <winsock.h>
 #include <mswsock.h>
+#include "../except.h"
+#include "../signal.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

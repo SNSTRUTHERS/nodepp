@@ -14,6 +14,12 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+#include "function.h"
+#include "ptr.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp {
 template< class V > class queue_t {
 protected:

@@ -14,7 +14,14 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { template< class T > class initializer_t : public ptr_t<T> { 
+#include "array.h"
+#include "iterator.h"
+#include "ptr.h"
+#include "queue.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
+namespace nodepp { template< class T > class initializer_t : public ptr_t<T> {
     public: initializer_t() noexcept : ptr_t<T>(){}
 
     /*─······································································─*/
@@ -90,7 +97,7 @@ namespace nodepp { template< class T > class initializer_t : public ptr_t<T> {
                out = func( out, *addr );
         } return out;
     }
-    
+
 };}
 
 /*────────────────────────────────────────────────────────────────────────────*/

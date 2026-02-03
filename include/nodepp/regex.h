@@ -14,6 +14,16 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "macros.h"
+#include "array.h"
+#include "coroutine.h"
+#include "except.h"
+#include "ptr.h"
+#include "string.h"
+#include "queue.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { class regex_t : public generator_t {
 protected:
 

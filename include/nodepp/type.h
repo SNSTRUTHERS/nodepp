@@ -12,6 +12,8 @@
 #ifndef NODEPP_TYPE
 #define NODEPP_TYPE
 
+#include "macros.h"
+
 /*────────────────────────────────────────────────────────────────────────────*/
 
 namespace nodepp { namespace type {

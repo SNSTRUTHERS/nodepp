@@ -14,6 +14,12 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
+#include "function.h"
+#include "queue.h"
+#include "task.h"
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
 namespace nodepp { template< class T, class... A > class wait_t {
 protected:
 

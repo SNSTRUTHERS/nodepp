@@ -17,6 +17,14 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <cerrno>
+#include "os.h"
+#include "../evloop.h"
+#ifndef NODEPP_FILE
+#   define NODEPP_FILE
+#endif
+#include "../generator.h"
+#include "../string.h"
 
 /*────────────────────────────────────────────────────────────────────────────*/
 

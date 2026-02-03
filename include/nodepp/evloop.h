@@ -14,7 +14,29 @@
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
-namespace nodepp { namespace process { atomic_t<bool> _EXIT_ = false;
+#ifdef uint
+#   undef uint
+#endif
+#ifdef ulong
+#   undef ulong
+#endif
+#include <cstdlib>
+#include "atomic.h"
+#include "kernel.h"
+#include "ptr.h"
+#include "task.h"
+#ifndef uint
+#   define uint unsigned int
+#endif
+#ifndef ulong
+#   define ulong unsigned long
+#endif
+
+/*────────────────────────────────────────────────────────────────────────────*/
+
+namespace nodepp::process { inline atomic_t<bool> _EXIT_ = false;
+
+    inline kernel_t& NODEPP_EV_LOOP(){ thread_local static kernel_t evloop; return evloop; }
 
     kernel_t& NODEPP_EV_LOOP(){ thread_local static kernel_t evloop; return evloop; }
     
@@ -57,7 +79,7 @@ namespace nodepp { namespace process { atomic_t<bool> _EXIT_ = false;
         _EXIT_.set(true); clear(); DONE:; ::exit(err); 
     }
 
-}}
+}
 
 /*────────────────────────────────────────────────────────────────────────────*/
 
