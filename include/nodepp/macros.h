@@ -48,8 +48,9 @@ template< class T > T clamp( const T& val, const T& _min, const T& _max ){ retur
 /*────────────────────────────────────────────────────────────────────────────*/
 
 #define onMain INIT(); int main( int argc, char** args ) { \
-   process::start( argc,args ); INIT(); \
-   process::stop(); return 0;           \
+    using namespace nodepp; \
+    process::start( argc,args ); INIT(); \
+    process::stop(); return 0;           \
 }  void INIT
 
 /*────────────────────────────────────────────────────────────────────────────*/
